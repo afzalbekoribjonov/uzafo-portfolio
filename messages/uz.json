@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "siteTitle": "UZAFO | Afzalbek Oribjonov",
+    "siteDescription": "Afzalbek Oribjonovning portfolio sayti: loyihalar, blog yozuvlari, muhokamalar va resume bir joyda."
+  },
+  "nav": {
+    "brand": "UZAFO",
+    "about": "Dasturchi haqida",
+    "discussions": "Muhokama",
+    "resume": "Resume",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "admin": "Admin"
+  },
+  "common": {
+    "latest": "Eng so‘nggi",
+    "viewAll": "Barchasini ko‘rish",
+    "readMore": "Batafsil o‘qish",
+    "openDiscussion": "Muhokamani ochish",
+    "openProject": "Loyihani ko‘rish",
+    "downloadPdf": "PDF yuklab olish",
+    "exploreMore": "Ko‘proq ko‘rish",
+    "liveDemo": "Demo",
+    "status": "Holat",
+    "category": "Kategoriya",
+    "posted": "Joylangan",
+    "by": "Muallif",
+    "search": "Qidirish",
+    "latestPost": "Eng so‘nggi blog posti",
+    "latestDiscussion": "Eng so‘nggi muhokama",
+    "featuredProject": "Tanlangan loyiha",
+    "randomProject": "Random loyiha",
+    "skills": "Ko‘nikmalar",
+    "experience": "Tajriba",
+    "education": "Ta’lim",
+    "contact": "Bog‘lanish",
+    "copyEmail": "Email nusxalash",
+    "messages": "Xabarlar",
+    "comments": "Kommentlar",
+    "likes": "Like",
+    "dislikes": "Dislike",
+    "onlineUsers": "Onlayn foydalanuvchilar",
+    "editorPreview": "Muharrir preview",
+    "saveChanges": "O‘zgarishlarni saqlash",
+    "notImplemented": "Bu amal hozircha interfeys ichida qisqa preview sifatida ko‘rsatilgan.",
+    "adminNotice": "Demo admin panel"
+  },
+  "home": {
+    "eyebrow": "Portfolio Site",
+    "title": "Kod, mahsulot va AI integratsiyalarini birlashtiradigan developer.",
+    "subtitle": "Responsive, ko‘p tilli va puxta tartiblangan portfolio tajribasi.",
+    "ctaPrimary": "Portfolio ko‘rish",
+    "ctaSecondary": "Resume ochish",
+    "rolePrefix": "uzafo",
+    "sectionsTitle": "Asosiy bo‘limlar",
+    "sectionsSubtitle": "Har bir bo‘lim ish uslubim, tajribam va amaliy natijalarni tez ko‘rsatish uchun tartiblangan.",
+    "roleDescriptions": {
+      "frontend": "Toza UI tizimlari, reusable komponentlar va zamonaviy web tajribalari.",
+      "backend": "API arxitekturasi, ma’lumot oqimi va deploy jarayonlari bilan ishlash.",
+      "ai": "LLM integratsiyalar, avtomatlashtirish va amaliy AI yordamchi yechimlar."
+    }
+  },
+  "about": {
+    "title": "Dasturchi haqida",
+    "subtitle": "Mening texnologiyalar, tajriba va o‘qish yo‘nalishlarim bitta joyda.",
+    "knowledgeMap": "Bilimlar xaritasi",
+    "timeline": "Yo‘l xaritasi",
+    "technologyTable": "Texnologiyalar jadvali"
+  },
+  "discussions": {
+    "title": "Muhokama",
+    "subtitle": "Imzolangan foydalanuvchilar savol qoldiradi, boshqalar yechim topishga yordam beradi.",
+    "sidebarTitle": "Mavzular",
+    "createTitle": "Yangi muhokama yaratish",
+    "formTitle": "Qisqa sarlavha",
+    "formContent": "Asosiy muammo",
+    "publish": "Muhokamani yaratish",
+    "toolbar": "Matn formatlash",
+    "signinHint": "Yangi muhokama yaratish va javob qoldirish uchun tizimga kirish kerak."
+  },
+  "resume": {
+    "title": "Resume",
+    "subtitle": "Mening tajribam, ko‘nikmalarim, ta’limim va ish yo‘nalishlarim.",
+    "summary": "Qisqa ma’lumot",
+    "experience": "Ish tajribasi",
+    "education": "Ta’lim",
+    "awards": "Yutuqlar"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "Muammolarni yechishga qaratilgan amaliy loyihalar to‘plami.",
+    "projectMetrics": "Loyiha ko‘rsatkichlari",
+    "openProject": "Loyihani ko‘rish"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Dasturlash, tizimlar va amaliy tajribalar haqida yozuvlar.",
+    "featured": "Tanlangan post",
+    "writePost": "Yangi post yozish"
+  },
+  "auth": {
+    "title": "Xush kelibsiz",
+    "subtitle": "Email va parol bilan kiring yoki Google orqali davom eting.",
+    "email": "Email",
+    "password": "Parol",
+    "forgot": "Parolni unutdingizmi?",
+    "continueGoogle": "Google orqali kirish",
+    "signinAction": "Kirish",
+    "signupAction": "Ro‘yxatdan o‘tish",
+    "newHere": "Ro‘yxatdan o‘tmaganmisiz?",
+    "alreadyHave": "Hisobingiz bormi?"
+  },
+  "admin": {
+    "title": "Admin boshqaruvi",
+    "subtitle": "Sahifa mazmuni, resume va blog postlarni bir joydan boshqarish.",
+    "profileEditor": "Profil bloklari",
+    "blogEditor": "Blog post muharriri",
+    "resumeEditor": "Resume muharriri",
+    "assets": "Media va icon boshqaruvi",
+    "users": "Faol foydalanuvchilar"
+  },
+  "footer": {
+    "title": "Portfolio, tajriba va amaliy ishlanmalar bir joyda.",
+    "subtitle": "Loyihalar, maqolalar va muhokamalar orqali ish uslubim va yondashuvimni ko‘rishingiz mumkin.",
+    "copyright": "Barcha huquqlar himoyalangan."
+  },
+  "errors": {
+    "notFoundTitle": "Sahifa topilmadi",
+    "notFoundText": "Bu manzil mavjud emas yoki ko‘chirilgan bo‘lishi mumkin.",
+    "goHome": "Bosh sahifaga qaytish",
+    "unexpected": "Kutilmagan xatolik yuz berdi"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "subtitle": "Sayt bo'ylab yo'l topish, bo'limlarni ochish va qisqa ma'lumot olish uchun foydalaning.",
+    "placeholder": "Masalan: portfolio haqida aytib ber",
+    "send": "Yuborish",
+    "hint": "Bubble’ni istalgan joyga sudrab olib boring.",
+    "quickPrompts": "Tezkor savollar",
+    "openPages": "Sahifalarni ochish",
+    "suggestedActions": "Tavsiya etilgan amallar",
+    "openAssistant": "AI yordamchini ochish",
+    "closeAssistant": "AI yordamchini yopish",
+    "copied": "Ma'lumot clipboard'ga nusxalandi."
+  }
+}

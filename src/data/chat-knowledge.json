@@ -1,0 +1,252 @@
+{
+  "greeting": {
+    "uz": "Salom! Men sayt ichidagi AI yordamchiman. Portfolio, blog, muhokama, resume, texnologiyalar, ish yo'nalishi va bog'lanish yo'llari haqida aniq ma'lumot bera olaman. Tezkor savollar yoki sahifa tugmalaridan foydalaning.",
+    "en": "Hi! I'm the on-site AI assistant. I can help you explore the portfolio, blog, discussions, resume, tech stack, work focus, and contact options. Use the quick prompts or page buttons below."
+  },
+  "fallback": {
+    "uz": "Bu savolni aniq yo'nalishga bog'lay olmadim. Men portfolio, blog, muhokama, resume, texnologiyalar, xizmatlar va bog'lanish yo'llari bo'yicha yordam bera olaman.",
+    "en": "I couldn't confidently map that question to a topic. I can still help with the portfolio, blog, discussions, resume, tech stack, work focus, and contact options."
+  },
+  "quickPrompts": [
+    {
+      "type": "prompt",
+      "label": {
+        "uz": "Nimalar qila olasiz?",
+        "en": "What can you help with?"
+      },
+      "value": "help"
+    },
+    {
+      "type": "prompt",
+      "label": {
+        "uz": "Texnologiyalar stacki",
+        "en": "Tech stack"
+      },
+      "value": "stack"
+    },
+    {
+      "type": "prompt",
+      "label": {
+        "uz": "Qanday ishlar qilasiz?",
+        "en": "What work do you do?"
+      },
+      "value": "work"
+    },
+    {
+      "type": "prompt",
+      "label": {
+        "uz": "Qanday bog'lansam bo'ladi?",
+        "en": "How can I contact you?"
+      },
+      "value": "contact"
+    }
+  ],
+  "quickRoutes": [
+    {
+      "type": "route",
+      "label": {
+        "uz": "Haqimda",
+        "en": "About"
+      },
+      "href": "/about"
+    },
+    {
+      "type": "route",
+      "label": {
+        "uz": "Portfolio",
+        "en": "Portfolio"
+      },
+      "href": "/portfolio"
+    },
+    {
+      "type": "route",
+      "label": {
+        "uz": "Blog",
+        "en": "Blog"
+      },
+      "href": "/blog"
+    },
+    {
+      "type": "route",
+      "label": {
+        "uz": "Muhokama",
+        "en": "Discussions"
+      },
+      "href": "/discussions"
+    },
+    {
+      "type": "route",
+      "label": {
+        "uz": "Resume",
+        "en": "Resume"
+      },
+      "href": "/resume"
+    }
+  ],
+  "intents": [
+    {
+      "id": "help",
+      "keywords": [
+        "help",
+        "assist",
+        "guide",
+        "navigate",
+        "yordam",
+        "nima qila olasan",
+        "nima qila olasiz",
+        "sayt boylab",
+        "sayt bo'ylab"
+      ],
+      "reply": {
+        "uz": "Men sayt bo'ylab yo'naltirish, bo'limlarni ochish va kerakli kontekstni tez topishda yordam beraman.",
+        "en": "I can help you navigate the site, open pages, and quickly surface the right context."
+      }
+    },
+    {
+      "id": "about",
+      "keywords": [
+        "about",
+        "who are you",
+        "who is uzafo",
+        "haqida",
+        "ozingiz",
+        "o'zingiz",
+        "developer",
+        "afzalbek"
+      ],
+      "reply": {
+        "uz": "Men developer profili, yo'nalishi va tajribasi haqida qisqa ma'lumot bera olaman.",
+        "en": "I can give you a concise overview of the developer profile, direction, and experience."
+      }
+    },
+    {
+      "id": "stack",
+      "keywords": [
+        "stack",
+        "skills",
+        "skill",
+        "technology",
+        "technologies",
+        "tech",
+        "texnologiya",
+        "ko'nikma",
+        "konikma"
+      ],
+      "reply": {
+        "uz": "Asosiy stack frontend, backend va AI qatlamlariga bo'lingan.",
+        "en": "The core stack is split across frontend, backend, and AI layers."
+      }
+    },
+    {
+      "id": "work",
+      "keywords": [
+        "work",
+        "services",
+        "service",
+        "what do you build",
+        "what do you do",
+        "xizmat",
+        "xizmatlar",
+        "qanday ish"
+      ],
+      "reply": {
+        "uz": "Asosiy fokus mahsulotga yaqin web tizimlar, admin panellar, API va AI integratsiyalarida.",
+        "en": "The main focus is product-oriented web systems, admin panels, APIs, and AI integrations."
+      }
+    },
+    {
+      "id": "portfolio",
+      "keywords": [
+        "portfolio",
+        "project",
+        "projects",
+        "case study",
+        "loyiha",
+        "loyihalar"
+      ],
+      "reply": {
+        "uz": "Portfolio bo'limi loyihalarni case-study usulida ko'rsatadi.",
+        "en": "The portfolio section presents projects in a case-study format."
+      }
+    },
+    {
+      "id": "blog",
+      "keywords": [
+        "blog",
+        "post",
+        "posts",
+        "maqola",
+        "yozuv",
+        "article"
+      ],
+      "reply": {
+        "uz": "Blog bo'limi dasturlash, tizimlar va amaliy tajriba yozuvlari uchun ishlatiladi.",
+        "en": "The blog is used for writing about programming, systems, and practical development work."
+      }
+    },
+    {
+      "id": "discussions",
+      "keywords": [
+        "discussion",
+        "discussions",
+        "forum",
+        "community",
+        "muhokama",
+        "savol",
+        "reply"
+      ],
+      "reply": {
+        "uz": "Muhokama bo'limi savol-javob va structured discussion oqimini qo'llab-quvvatlaydi.",
+        "en": "The discussions area supports Q&A and a more structured conversation flow."
+      }
+    },
+    {
+      "id": "resume",
+      "keywords": [
+        "resume",
+        "cv",
+        "experience",
+        "tajriba",
+        "education",
+        "talim",
+        "ta'lim"
+      ],
+      "reply": {
+        "uz": "Resume sahifasi tajriba, ko'nikmalar, ta'lim va yo'nalishni jamlaydi.",
+        "en": "The resume page brings together experience, skills, education, and working direction."
+      }
+    },
+    {
+      "id": "contact",
+      "keywords": [
+        "contact",
+        "email",
+        "telegram",
+        "linkedin",
+        "github",
+        "bog'lanish",
+        "boglanish",
+        "aloqa"
+      ],
+      "reply": {
+        "uz": "Bog'lanish uchun email va asosiy ijtimoiy kanallar mavjud.",
+        "en": "There is a direct email contact plus the main social channels."
+      }
+    },
+    {
+      "id": "admin",
+      "keywords": [
+        "admin",
+        "dashboard",
+        "edit",
+        "manage",
+        "boshqaruv",
+        "tahrirlash"
+      ],
+      "reply": {
+        "uz": "Admin qismi kontentni sahifa ichidan boshqarish oqimiga ulangan.",
+        "en": "The admin area is connected to an in-page content management flow."
+      }
+    }
+  ]
+}

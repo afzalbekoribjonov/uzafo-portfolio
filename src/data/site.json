@@ -1,0 +1,30 @@
+{
+  "brand": "UZAFO",
+  "tagline": {
+    "uz": "Kod, tizim va fikrlar bir joyda.",
+    "en": "Code, systems, and ideas in one place."
+  },
+  "socials": [
+    {
+      "name": "GitHub",
+      "href": "https://github.com/afzalbekoribjonov"
+    },
+    {
+      "name": "LinkedIn",
+      "href": "https://www.linkedin.com/in/afzalbekoribjonov"
+    },
+    {
+      "name": "Telegram",
+      "href": "https://t.me/uzafo"
+    },
+    {
+      "name": "Phone",
+      "href": "tel:+998941080916"
+    }
+  ],
+  "resumePdf": "/resume/uzafo-resume-demo.pdf",
+  "status": {
+    "uz": "Kontent, loyihalar va aloqa ma'lumotlari muntazam yangilanadi",
+    "en": "Content, projects, and contact details are kept up to date"
+  }
+}

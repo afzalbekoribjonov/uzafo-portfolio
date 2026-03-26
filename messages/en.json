@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "siteTitle": "UZAFO | Afzalbek Oribjonov",
+    "siteDescription": "Afzalbek Oribjonov portfolio featuring projects, writing, discussions, and resume in one place."
+  },
+  "nav": {
+    "brand": "UZAFO",
+    "about": "About Developer",
+    "discussions": "Discussion",
+    "resume": "Resume",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "admin": "Admin"
+  },
+  "common": {
+    "latest": "Latest",
+    "viewAll": "View all",
+    "readMore": "Read more",
+    "openDiscussion": "Open discussion",
+    "openProject": "Open project",
+    "downloadPdf": "Download PDF",
+    "exploreMore": "Explore more",
+    "liveDemo": "Demo",
+    "status": "Status",
+    "category": "Category",
+    "posted": "Posted",
+    "by": "By",
+    "search": "Search",
+    "latestPost": "Latest blog post",
+    "latestDiscussion": "Latest discussion",
+    "featuredProject": "Featured project",
+    "randomProject": "Random project",
+    "skills": "Skills",
+    "experience": "Experience",
+    "education": "Education",
+    "contact": "Contact",
+    "copyEmail": "Copy email",
+    "messages": "Messages",
+    "comments": "Comments",
+    "likes": "Like",
+    "dislikes": "Dislike",
+    "onlineUsers": "Online users",
+    "editorPreview": "Editor preview",
+    "saveChanges": "Save changes",
+    "notImplemented": "This action is currently shown as a lightweight preview in the interface.",
+    "adminNotice": "Demo admin panel"
+  },
+  "home": {
+    "eyebrow": "Portfolio Site",
+    "title": "A developer connecting code, product thinking, and AI integrations.",
+    "subtitle": "A responsive, multilingual portfolio experience with clear structure and focused storytelling.",
+    "ctaPrimary": "View portfolio",
+    "ctaSecondary": "Open resume",
+    "rolePrefix": "uzafo",
+    "sectionsTitle": "Core sections",
+    "sectionsSubtitle": "Each section is organized to show my approach, experience, and practical results at a glance.",
+    "roleDescriptions": {
+      "frontend": "Clean UI systems, reusable components, and modern web experiences.",
+      "backend": "API architecture, data flow design, and deployment workflows.",
+      "ai": "LLM integrations, automation, and practical AI-powered experiences."
+    }
+  },
+  "about": {
+    "title": "About the Developer",
+    "subtitle": "My technologies, experience, and learning direction in one place.",
+    "knowledgeMap": "Knowledge map",
+    "timeline": "Journey timeline",
+    "technologyTable": "Technology table"
+  },
+  "discussions": {
+    "title": "Discussion",
+    "subtitle": "Signed-in users can post problems and collaborate on solutions.",
+    "sidebarTitle": "Topics",
+    "createTitle": "Create a new discussion",
+    "formTitle": "Short title",
+    "formContent": "Main problem",
+    "publish": "Create discussion",
+    "toolbar": "Text formatting",
+    "signinHint": "Sign in to create discussions and leave replies."
+  },
+  "resume": {
+    "title": "Resume",
+    "subtitle": "My experience, skills, education, and working direction.",
+    "summary": "Summary",
+    "experience": "Experience",
+    "education": "Education",
+    "awards": "Highlights"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "A collection of practical projects focused on solving real problems.",
+    "projectMetrics": "Project metrics",
+    "openProject": "Open project"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Writing about programming, systems, and practical development work.",
+    "featured": "Featured post",
+    "writePost": "Write a new post"
+  },
+  "auth": {
+    "title": "Welcome back",
+    "subtitle": "Sign in with email and password or continue with Google.",
+    "email": "Email",
+    "password": "Password",
+    "forgot": "Forgot password?",
+    "continueGoogle": "Continue with Google",
+    "signinAction": "Sign in",
+    "signupAction": "Sign up",
+    "newHere": "New here?",
+    "alreadyHave": "Already have an account?"
+  },
+  "admin": {
+    "title": "Admin controls",
+    "subtitle": "Manage page content, resume, and blog posts from one place.",
+    "profileEditor": "Profile blocks",
+    "blogEditor": "Blog editor",
+    "resumeEditor": "Resume editor",
+    "assets": "Media and icon manager",
+    "users": "Active users"
+  },
+  "footer": {
+    "title": "Portfolio, experience, and practical work in one place.",
+    "subtitle": "Explore projects, writing, and discussions to get a clear sense of my approach and strengths.",
+    "copyright": "All rights reserved."
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "This route does not exist or may have been moved.",
+    "goHome": "Go back home",
+    "unexpected": "An unexpected error occurred"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "subtitle": "Use it to navigate the site, open sections, and get concise context fast.",
+    "placeholder": "For example: tell me about the portfolio",
+    "send": "Send",
+    "hint": "Drag the bubble anywhere on the page.",
+    "quickPrompts": "Quick prompts",
+    "openPages": "Open pages",
+    "suggestedActions": "Suggested actions",
+    "openAssistant": "Open AI assistant",
+    "closeAssistant": "Close AI assistant",
+    "copied": "Copied to clipboard."
+  }
+}
