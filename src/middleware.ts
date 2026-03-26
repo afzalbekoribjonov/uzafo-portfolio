@@ -1,7 +1,11 @@
 import createMiddleware from 'next-intl/middleware';
 import {routing} from './i18n/routing';
 
-export default createMiddleware(routing);
+const intlMiddleware = createMiddleware(routing);
+
+export default intlMiddleware;
+
+export const runtime = 'edge';
 
 export const config = {
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)'

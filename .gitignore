@@ -9,6 +9,7 @@ build
 .wrangler
 .env*
 !.env.example
+package-lock.json
 coverage
 *.log
 dev-*.out

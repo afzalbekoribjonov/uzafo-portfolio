@@ -2,6 +2,7 @@
   "name": "uzafo-portfolio-site",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.33.0",
   "description": "Multilingual portfolio frontend for UZAFO built with Next.js, Tailwind CSS, next-intl, Tiptap, and demo JSON data.",
   "engines": {
     "node": "20.x"
