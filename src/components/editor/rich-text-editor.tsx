@@ -2,6 +2,7 @@
 
 import {useEffect} from 'react';
 import Placeholder from '@tiptap/extension-placeholder';
+import Underline from '@tiptap/extension-underline';
 import {EditorContent, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
@@ -52,6 +53,7 @@ export function RichTextEditor({
       StarterKit.configure({
         heading: {levels: [1, 2, 3]}
       }),
+      Underline,
       Placeholder.configure({placeholder})
     ],
     content: value,

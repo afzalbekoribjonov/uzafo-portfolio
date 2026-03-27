@@ -154,8 +154,8 @@ export function BlogDetailClient({initialPosts, slug}: {initialPosts: BlogPost[]
             <ArrowLeft className="h-4 w-4" /> Barcha postlar
           </Link>
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
-            <article className="space-y-6 rounded-[28px] border border-white/10 bg-white/5 p-6">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
+            <article className="min-w-0 space-y-6 rounded-[28px] border border-white/10 bg-white/5 p-6">
               {editing ? (
                 <div className="space-y-4">
                   {/* Title */}
@@ -348,8 +348,8 @@ export function BlogDetailClient({initialPosts, slug}: {initialPosts: BlogPost[]
             </article>
 
             {/* Sidebar */}
-            <aside className="space-y-5">
-              <div className="sticky top-24 space-y-4">
+            <aside className="min-w-0 space-y-5 lg:sticky lg:top-24 lg:self-start">
+              <div className="space-y-4">
                 <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 space-y-4">
                   <h3 className="text-sm font-semibold text-white">Post haqida</h3>
                   {[
