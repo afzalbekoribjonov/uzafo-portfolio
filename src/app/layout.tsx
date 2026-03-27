@@ -17,8 +17,12 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   keywords: ['Afzalbek Oribjonov', 'UZAFO', 'portfolio', 'blog', 'AI developer', 'frontend developer'],
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg'
+    icon: [
+      {url: '/favicon.ico', sizes: 'any'},
+      {url: '/favicon-48x48.png', type: 'image/png', sizes: '48x48'}
+    ],
+    shortcut: '/favicon.ico',
+    apple: [{url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180'}]
   },
   openGraph: {
     title: 'UZAFO | Afzalbek Oribjonov',
