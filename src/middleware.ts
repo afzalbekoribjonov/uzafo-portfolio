@@ -5,8 +5,6 @@ const intlMiddleware = createMiddleware(routing);
 
 export default intlMiddleware;
 
-export const runtime = 'edge';
-
 export const config = {
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)'
 };
