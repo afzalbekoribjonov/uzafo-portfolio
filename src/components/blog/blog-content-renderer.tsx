@@ -172,8 +172,40 @@ function renderCodeBlock(content: string, language: string | undefined) {
   };
 }
 
+function readHtmlAttribute(source: string, attribute: string) {
+  const pattern = new RegExp(`\\b${attribute}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i');
+  const match = source.match(pattern);
+  return match?.[1] ?? match?.[2] ?? match?.[3] ?? '';
+}
+
+function extractLanguageFromAttributes(...attributeSources: string[]) {
+  for (const source of attributeSources) {
+    if (!source.trim()) continue;
+
+    const directLanguage =
+      readHtmlAttribute(source, 'data-language') ||
+      readHtmlAttribute(source, 'data-lang') ||
+      readHtmlAttribute(source, 'lang');
+
+    if (directLanguage) return directLanguage;
+
+    const className = readHtmlAttribute(source, 'class');
+    if (!className) continue;
+
+    const languageClass = className
+      .split(/\s+/)
+      .map((token) => token.trim())
+      .find((token) => token.toLowerCase().startsWith('language-'));
+
+    if (languageClass) return languageClass.slice('language-'.length);
+  }
+
+  return undefined;
+}
+
 function enhanceRichTextHtml(html: string) {
-  return html.replace(/<pre><code(?:\s+class="language-([^"]+)")?>([\s\S]*?)<\/code><\/pre>/gi, (_match, language: string | undefined, code: string) => {
+  return html.replace(/<pre\b([^>]*)>\s*<code\b([^>]*)>([\s\S]*?)<\/code>\s*<\/pre>/gi, (_match, preAttributes: string, codeAttributes: string, code: string) => {
+    const language = extractLanguageFromAttributes(preAttributes, codeAttributes);
     const rendered = renderCodeBlock(code, language);
     return `
       <div class="blog-code-shell">
