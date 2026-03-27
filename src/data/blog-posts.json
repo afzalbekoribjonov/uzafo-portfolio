@@ -26,7 +26,7 @@
       {
         "type": "paragraph",
         "content": {
-          "uz": "Ko'p loyihalarda frontend tez yoziladi, ammo keyin API bilan ulash paytida komponentlar, ma'lumot strukturalari va sahifalar chalkashib ketadi.",
+          "uz": "Ko'p loyihalarda frontend tez yoziladi , ammo keyin API bilan ulash paytida komponentlar, ma'lumot strukturalari va sahifalar chalkashib ketadi.",
           "en": "In many projects the frontend is built quickly, but once API integration starts, components, data shapes, and pages become tangled."
         }
       },
