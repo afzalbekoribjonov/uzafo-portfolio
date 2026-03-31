@@ -2,7 +2,7 @@ import type {Locale} from '@/lib/types';
 
 export const SITE_NAME = 'UZAFO';
 export const SITE_OWNER = 'Afzalbek Oribjonov';
-export const DEFAULT_SITE_URL = 'https://uzafo.pages.dev';
+export const DEFAULT_SITE_URL = 'https://uzafo.site';
 export const DEFAULT_META_DESCRIPTION = 'Afzalbek Oribjonov portfolio: projects, writing, discussions, and resume.';
 
 function normalizeSiteUrl(value?: string) {
