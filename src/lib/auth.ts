@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {DemoSession} from '@/lib/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE?.trim().replace(/\/+$/, '') ?? '';
 const IS_LIVE = Boolean(API_BASE);
 const SESSION_KEY = 'uzafo-live-session-v1';
 const AUTH_EVENT = 'auth-updated';
@@ -71,12 +71,16 @@ function toStoredSession(payload: AuthResponse): StoredSession {
   };
 }
 
-function inferSessionName(normalizedEmail: string): string {
-  return normalizedEmail.split('@')[0]?.replace(/[._-]/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase()) || 'Guest User';
+function ensureApiBase() {
+  if (!API_BASE) {
+    throw new Error('NEXT_PUBLIC_API_BASE is not configured.');
+  }
+  return API_BASE;
 }
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const apiBase = ensureApiBase();
+  const res = await fetch(`${apiBase}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
@@ -123,7 +127,7 @@ async function refreshLiveSession(): Promise<StoredSession | null> {
 }
 
 export async function authFetch(input: string, init?: RequestInit, allowRefresh = true): Promise<Response> {
-  if (!IS_LIVE) return fetch(input, init);
+  const apiBase = ensureApiBase();
 
   const session = readStoredSession();
   const headers = new Headers(init?.headers ?? {});
@@ -131,7 +135,7 @@ export async function authFetch(input: string, init?: RequestInit, allowRefresh 
     headers.set('Authorization', `Bearer ${session.accessToken}`);
   }
 
-  const response = await fetch(`${API_BASE}${input}`, {
+  const response = await fetch(`${apiBase}${input}`, {
     ...init,
     headers
   });
@@ -145,17 +149,13 @@ export async function authFetch(input: string, init?: RequestInit, allowRefresh 
 
   const retryHeaders = new Headers(init?.headers ?? {});
   retryHeaders.set('Authorization', `Bearer ${refreshed.accessToken}`);
-  return fetch(`${API_BASE}${input}`, {
+  return fetch(`${apiBase}${input}`, {
     ...init,
     headers: retryHeaders
   });
 }
 
 export async function signIn(email: string, password: string) {
-  if (!IS_LIVE) {
-    return signInDemo(email);
-  }
-
   const payload = await fetchJson<AuthResponse>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({email, password})
@@ -166,13 +166,6 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signUp(name: string, email: string, password: string) {
-  if (!IS_LIVE) {
-    const normalizedEmail = email.trim().toLowerCase();
-    const session: DemoSession = {email: normalizedEmail, name: name.trim() || 'Guest User', role: 'user'};
-    writeStoredSession({accessToken: 'demo', refreshToken: 'demo', user: session});
-    return {ok: true as const, session};
-  }
-
   const payload = await fetchJson<AuthResponse>('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({name, email, password})
@@ -182,20 +175,10 @@ export async function signUp(name: string, email: string, password: string) {
   return {ok: true as const, session: session.user};
 }
 
-export function signInDemo(email: string) {
-  if (typeof window === 'undefined') return {ok: false as const, message: 'Client only'};
-  const normalizedEmail = email.trim().toLowerCase();
-  const name = inferSessionName(normalizedEmail);
-
-  const session: DemoSession = {email: normalizedEmail, name, role: 'user'};
-  writeStoredSession({accessToken: 'demo', refreshToken: 'demo', user: session});
-  return {ok: true as const, session};
-}
-
 export async function signOutLive() {
   const current = readStoredSession();
   try {
-    if (IS_LIVE && current?.refreshToken) {
+    if (current?.refreshToken) {
       await fetchJson('/api/auth/logout', {
         method: 'POST',
         body: JSON.stringify({refreshToken: current.refreshToken})
@@ -206,10 +189,6 @@ export async function signOutLive() {
   } finally {
     writeStoredSession(null);
   }
-}
-
-export function signOutDemo() {
-  writeStoredSession(null);
 }
 
 export function getAccessToken() {

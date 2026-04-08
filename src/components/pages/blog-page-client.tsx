@@ -7,13 +7,11 @@ import {Link, useRouter} from '@/i18n/navigation';
 import {DynamicMedia} from '@/components/ui/dynamic-media';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
-import {isLiveModeEnabled, useDemoSession} from '@/lib/auth';
+import {useDemoSession} from '@/lib/auth';
 import {createPost as createPostApi, deletePostApi} from '@/lib/api-service';
 import {useManagedBlogPosts, useManagedProfile} from '@/lib/demo-store';
 import type {BlogPost, Locale, Profile} from '@/lib/types';
 import {estimateReadingTimeFromBlocks, formatTimestamp, makeId, resolveText} from '@/lib/utils';
-
-const IS_LIVE = isLiveModeEnabled();
 
 /* ── Featured Post Card ──────────────────────────────────────────────────── */
 function FeaturedCard({post, locale, isAdmin, onDelete}: {post: BlogPost; locale: Locale; isAdmin: boolean; onDelete: () => void}) {
@@ -164,7 +162,7 @@ export function BlogPageClient({initialPosts, initialProfile}: {initialPosts: Bl
   const router = useRouter();
   const {isAdmin} = useDemoSession();
   const [profile] = useManagedProfile(initialProfile);
-  const [posts, setPosts, , replacePosts] = useManagedBlogPosts(initialPosts);
+  const [posts, , , replacePosts] = useManagedBlogPosts(initialPosts);
   const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
 
   const ordered = useMemo(() => [...posts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)), [posts]);
@@ -189,25 +187,20 @@ export function BlogPageClient({initialPosts, initialProfile}: {initialPosts: Bl
     };
     try {
       const created = await createPostApi(draft);
-      setPosts([created, ...posts]);
+      replacePosts((current) => [created, ...current]);
       router.push(`/blog/${created.slug}?edit=1`);
-      return;
-    } catch {}
-    setPosts([draft, ...posts]);
-    router.push(`/blog/${slug}?edit=1`);
+    } catch (error) {
+      console.error('Failed to create blog post.', error);
+    }
   };
 
   const deletePost = async (slug: string) => {
-    if (IS_LIVE) {
-      try {
-        await deletePostApi(slug);
-        replacePosts((current) => current.filter((post) => post.slug !== slug));
-      } catch (error) {
-        console.error(`Failed to delete post ${slug}.`, error);
-        return;
-      }
-    } else {
-      setPosts(posts.filter(p => p.slug !== slug));
+    try {
+      await deletePostApi(slug);
+      replacePosts((current) => current.filter((post) => post.slug !== slug));
+    } catch (error) {
+      console.error(`Failed to delete post ${slug}.`, error);
+      return;
     }
     setConfirmSlug(null);
   };

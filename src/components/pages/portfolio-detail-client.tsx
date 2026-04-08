@@ -11,14 +11,12 @@ import {DynamicMedia, MediaTypeBadge} from '@/components/ui/dynamic-media';
 import {AdminInlineBar} from '@/components/ui/admin-inline-bar';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
-import {isLiveModeEnabled, useDemoSession} from '@/lib/auth';
+import {useDemoSession} from '@/lib/auth';
 import {deleteProject as deleteProjectApi} from '@/lib/api-service';
 import {useManagedProjects} from '@/lib/demo-store';
 import {uploadMediaSource} from '@/lib/imagekit';
 import type {Locale, Project} from '@/lib/types';
 import {makeId, normalizeProject, resolveText} from '@/lib/utils';
-
-const IS_LIVE = isLiveModeEnabled();
 
 
 function ConfirmDialog({message, onConfirm, onCancel}: {message: string; onConfirm: () => void; onCancel: () => void}) {
@@ -85,18 +83,13 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
 
   const cancelDraft = () => { setDraft(project); setEditing(false); };
   const deleteProject = async () => {
-    if (IS_LIVE) {
-      try {
-        await deleteProjectApi(slug);
-        replaceProjects((current) => current.filter((item) => item.slug !== slug));
-        router.push('/portfolio');
-      } catch (error) {
-        console.error(`Failed to delete project ${slug}.`, error);
-      }
-      return;
+    try {
+      await deleteProjectApi(slug);
+      replaceProjects((current) => current.filter((item) => item.slug !== slug));
+      router.push('/portfolio');
+    } catch (error) {
+      console.error(`Failed to delete project ${slug}.`, error);
     }
-    setProjects(projects.filter((item) => item.slug !== slug));
-    router.push('/portfolio');
   };
   const displayed = editing ? draft : project;
 

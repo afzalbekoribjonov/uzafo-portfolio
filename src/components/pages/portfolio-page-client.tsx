@@ -7,13 +7,11 @@ import {Link, useRouter} from '@/i18n/navigation';
 import {DynamicMedia} from '@/components/ui/dynamic-media';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
-import {isLiveModeEnabled, useDemoSession} from '@/lib/auth';
+import {useDemoSession} from '@/lib/auth';
 import {createProject as createProjectApi, deleteProject as deleteProjectApi} from '@/lib/api-service';
 import {useManagedProjects} from '@/lib/demo-store';
 import type {Locale, Project} from '@/lib/types';
 import {makeId, normalizeProject, resolveText} from '@/lib/utils';
-
-const IS_LIVE = isLiveModeEnabled();
 
 export function PortfolioPageClient({initialProjects}: {initialProjects: Project[]}) {
   const locale = useLocale() as Locale;
@@ -21,7 +19,7 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
   const common = useTranslations('common');
   const router = useRouter();
   const {isAdmin} = useDemoSession();
-  const [projects, setProjects, , replaceProjects] = useManagedProjects(initialProjects);
+  const [projects, , , replaceProjects] = useManagedProjects(initialProjects);
   const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
 
   const createProject = async () => {
@@ -41,25 +39,20 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
     });
     try {
       const created = await createProjectApi(project);
-      setProjects([created, ...projects]);
+      replaceProjects((current) => [created, ...current]);
       router.push(`/portfolio/${created.slug}?edit=1`);
-      return;
-    } catch {}
-    setProjects([project, ...projects]);
-    router.push(`/portfolio/${slug}?edit=1`);
+    } catch (error) {
+      console.error('Failed to create project.', error);
+    }
   };
 
   const deleteProject = async (slug: string) => {
-    if (IS_LIVE) {
-      try {
-        await deleteProjectApi(slug);
-        replaceProjects((current) => current.filter((project) => project.slug !== slug));
-      } catch (error) {
-        console.error(`Failed to delete project ${slug}.`, error);
-        return;
-      }
-    } else {
-      setProjects(projects.filter(p => p.slug !== slug));
+    try {
+      await deleteProjectApi(slug);
+      replaceProjects((current) => current.filter((project) => project.slug !== slug));
+    } catch (error) {
+      console.error(`Failed to delete project ${slug}.`, error);
+      return;
     }
     setConfirmSlug(null);
   };

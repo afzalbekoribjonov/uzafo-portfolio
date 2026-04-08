@@ -2,6 +2,8 @@ import type {MetadataRoute} from 'next';
 import {getBlogPosts, getDiscussions, getProjects} from '@/lib/data';
 import {getLocalizedUrl} from '@/lib/site-config';
 
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locales = ['uz', 'en'] as const;
   const staticPaths = ['', '/about', '/discussions', '/resume', '/portfolio', '/blog', '/auth/sign-in', '/auth/sign-up', '/admin'];

@@ -1,18 +1,10 @@
 import 'server-only';
 
-import blogPostsJson from '@/data/blog-posts.json';
-import chatKnowledgeJson from '@/data/chat-knowledge.json';
-import discussionsJson from '@/data/discussions.json';
-import profileJson from '@/data/profile.json';
-import projectsJson from '@/data/projects.json';
-import resumeJson from '@/data/resume.json';
-import siteJson from '@/data/site.json';
-import usersJson from '@/data/users.json';
+import {cache} from 'react';
 import {applyProfileContactOverrides, applySiteContactOverrides} from '@/lib/contact';
 import type {
   ApiListResponse,
   BlogPost,
-  ChatKnowledge,
   Discussion,
   MockUser,
   Profile,
@@ -22,68 +14,122 @@ import type {
 } from '@/lib/types';
 import {normalizeBlogPosts, normalizeDiscussions, normalizeProfile, normalizeProjects, normalizeResume} from '@/lib/normalizers';
 
-const staticProfile = applyProfileContactOverrides(normalizeProfile(profileJson as unknown as Profile));
-const staticSite = applySiteContactOverrides(siteJson as SiteData);
-const staticProjects = normalizeProjects(projectsJson as unknown as Project[]);
-const staticBlogPosts = normalizeBlogPosts(blogPostsJson as unknown as BlogPost[]);
-const staticDiscussions = normalizeDiscussions(discussionsJson as unknown as Discussion[]);
-const staticResume = normalizeResume(resumeJson as unknown as ResumeData);
-const staticUsers = usersJson as MockUser[];
-const staticChatKnowledge = chatKnowledgeJson as ChatKnowledge;
+export class BackendUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'BackendUnavailableError';
+  }
+}
 
 function getApiBase() {
   const base = process.env.NEXT_PUBLIC_API_BASE?.trim();
-  return base ? base.replace(/\/+$/, '') : '';
+  if (!base) {
+    throw new BackendUnavailableError('NEXT_PUBLIC_API_BASE is not configured.');
+  }
+  return base.replace(/\/+$/, '');
 }
 
-function isLiveDataEnabled() {
-  return Boolean(getApiBase());
-}
-
-async function fetchLiveJson<T>(path: string): Promise<T | null> {
-  const apiBase = getApiBase();
-  if (!apiBase) return null;
+async function parseJsonResponse<T>(response: Response, path: string): Promise<T> {
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.includes('application/json')) {
+    const preview = (await response.text().catch(() => '')).slice(0, 160);
+    throw new BackendUnavailableError(
+      `Expected JSON from ${path}, received "${contentType || 'unknown'}"${preview ? `: ${preview}` : '.'}`
+    );
+  }
 
   try {
-    const response = await fetch(`${apiBase}${path}`, {
+    return await response.json() as T;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Invalid JSON response.';
+    throw new BackendUnavailableError(`Failed to parse ${path}: ${message}`);
+  }
+}
+
+async function fetchLiveJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const apiBase = getApiBase();
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBase}${path}`, {
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+        ...(init?.headers ?? {})
+      },
+      ...init
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Network error.';
+    throw new BackendUnavailableError(`Failed to reach backend for ${path}: ${message}`);
+  }
+
+  if (!response.ok) {
+    const detail = (await response.text().catch(() => '')).slice(0, 160);
+    throw new BackendUnavailableError(
+      `Backend request failed for ${path}: HTTP ${response.status}${detail ? ` ${detail}` : ''}`
+    );
+  }
+
+  return parseJsonResponse<T>(response, path);
+}
+
+export const probeBackendHealth = cache(async () => {
+  const apiBase = getApiBase();
+
+  try {
+    const headResponse = await fetch(`${apiBase}/health`, {
+      method: 'HEAD',
+      cache: 'no-store'
+    });
+    if (headResponse.ok) {
+      return true;
+    }
+  } catch {
+    // Fall through to GET probe below.
+  }
+
+  try {
+    const response = await fetch(`${apiBase}/health`, {
       cache: 'no-store',
       headers: {
         Accept: 'application/json'
       }
     });
     if (!response.ok) {
-      return null;
+      throw new BackendUnavailableError(`Backend health probe returned HTTP ${response.status}.`);
     }
-    return response.json() as Promise<T>;
-  } catch {
-    return null;
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Health probe failed.';
+    throw new BackendUnavailableError(message);
   }
-}
+});
 
-export async function getProfile() {
+export const getProfile = cache(async () => {
   const live = await fetchLiveJson<Profile>('/api/profile');
-  return applyProfileContactOverrides(normalizeProfile(live ?? staticProfile));
-}
+  return applyProfileContactOverrides(normalizeProfile(live));
+});
 
-export async function getSite() {
+export const getSite = cache(async () => {
   const live = await fetchLiveJson<SiteData>('/api/site');
-  return applySiteContactOverrides(live ?? staticSite);
-}
+  return applySiteContactOverrides(live);
+});
 
-export async function getProjects() {
+export const getProjects = cache(async () => {
   const live = await fetchLiveJson<ApiListResponse<Project>>('/api/projects');
-  return normalizeProjects(live?.items ?? staticProjects);
-}
+  return normalizeProjects(live.items);
+});
 
 export async function getProjectBySlug(slug: string) {
   const projects = await getProjects();
   return projects.find((project) => project.slug === slug) ?? null;
 }
 
-export async function getBlogPosts() {
+export const getBlogPosts = cache(async () => {
   const live = await fetchLiveJson<ApiListResponse<BlogPost>>('/api/posts');
-  return normalizeBlogPosts(live?.items ?? staticBlogPosts).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
-}
+  return normalizeBlogPosts(live.items).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+});
 
 export async function getBlogPostBySlug(slug: string) {
   const posts = await getBlogPosts();
@@ -95,33 +141,19 @@ export async function getFeaturedBlogPost() {
   return posts.find((post) => post.featured) ?? posts[0] ?? null;
 }
 
-export async function getDiscussions() {
+export const getDiscussions = cache(async () => {
   const live = await fetchLiveJson<ApiListResponse<Discussion>>('/api/discussions');
-  return normalizeDiscussions(live?.items ?? staticDiscussions).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-}
+  return normalizeDiscussions(live.items).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+});
 
 export async function getDiscussionBySlug(slug: string) {
   const discussions = await getDiscussions();
   return discussions.find((discussion) => discussion.slug === slug) ?? null;
 }
 
-export async function getResume() {
+export const getResume = cache(async () => {
   const live = await fetchLiveJson<ResumeData>('/api/resume');
-  return normalizeResume(live ?? staticResume);
-}
+  return normalizeResume(live);
+});
 
-export async function getUsers() {
-  if (isLiveDataEnabled()) {
-    return [] as MockUser[];
-  }
-  return staticUsers;
-}
-
-export async function getOnlineUsers() {
-  const users = await getUsers();
-  return users.filter((user) => user.status === 'online');
-}
-
-export async function getChatKnowledge() {
-  return staticChatKnowledge;
-}
+export const getUsers = cache(async () => [] as MockUser[]);

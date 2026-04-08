@@ -9,13 +9,11 @@ import {AdminInlineBar} from '@/components/ui/admin-inline-bar';
 import {RichTextEditor} from '@/components/editor/rich-text-editor';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
-import {isLiveModeEnabled, useDemoSession} from '@/lib/auth';
-import {addReply as addReplyApi, deleteDiscussion as deleteDiscussionApi} from '@/lib/api-service';
+import {useDemoSession} from '@/lib/auth';
+import {addReply as addReplyApi, deleteDiscussion as deleteDiscussionApi, deleteReply as deleteReplyApi} from '@/lib/api-service';
 import {useManagedDiscussions} from '@/lib/demo-store';
 import type {Discussion, Locale} from '@/lib/types';
-import {formatDateTime, makeId, resolveText, slugify} from '@/lib/utils';
-
-const IS_LIVE = isLiveModeEnabled();
+import {formatDateTime, resolveText, slugify} from '@/lib/utils';
 
 function Confirm({msg, onOk, onCancel}: {msg:string; onOk:()=>void; onCancel:()=>void}) {
   return (
@@ -41,7 +39,6 @@ export function DiscussionDetailPageClient({initialDiscussions, slug}: {initialD
   const searchParams = useSearchParams();
   const {isAdmin, session, isSignedIn} = useDemoSession();
   const [discussions, setDiscussions, , replaceDiscussions] = useManagedDiscussions(initialDiscussions);
-  const [replyName, setReplyName] = useState('');
   const [reply, setReply] = useState('<p></p>');
   const [editing, setEditing] = useState(false);
   const [confirmDisc, setConfirmDisc] = useState(false);
@@ -73,51 +70,39 @@ export function DiscussionDetailPageClient({initialDiscussions, slug}: {initialD
   };
 
   const deleteDiscussion = async () => {
-    if (IS_LIVE) {
-      try {
-        await deleteDiscussionApi(slug);
-        replaceDiscussions((current) => current.filter((discussionItem) => discussionItem.slug !== slug));
-        router.push('/discussions');
-      } catch (error) {
-        console.error(`Failed to delete discussion ${slug}.`, error);
-      }
-      return;
+    try {
+      await deleteDiscussionApi(slug);
+      replaceDiscussions((current) => current.filter((discussionItem) => discussionItem.slug !== slug));
+      router.push('/discussions');
+    } catch (error) {
+      console.error(`Failed to delete discussion ${slug}.`, error);
     }
-    setDiscussions(discussions.filter(d => d.slug !== slug));
-    router.push('/discussions');
   };
 
-  const removeReply = (id: string) => {
-    setDiscussions(discussions.map(d => d.slug === slug ? {...d, messages: d.messages.filter(m => m.id !== id)} : d));
-    setConfirmReplyId(null);
+  const removeReply = async (id: string) => {
+    try {
+      await deleteReplyApi(slug, id);
+      replaceDiscussions((current) => current.map((discussionItem) => discussionItem.slug === slug ? {
+        ...discussionItem,
+        messages: discussionItem.messages.filter((message) => message.id !== id)
+      } : discussionItem));
+      setConfirmReplyId(null);
+    } catch (error) {
+      console.error(`Failed to delete reply ${id} on ${slug}.`, error);
+    }
   };
 
   const submitReply = async () => {
     const text = reply.trim();
     if (!text || text === '<p></p>' || text === '<p><br></p>') return;
-    if (IS_LIVE) {
-      try {
-        const updated = await addReplyApi(slug, {text: reply});
-        replaceDiscussions((current) => current.map((discussionItem) => discussionItem.slug === slug ? updated : discussionItem));
-        setReply('<p></p>');
-        setReplyName('');
-      } catch (error) {
-        console.error(`Failed to add reply to discussion ${slug}.`, error);
-      }
-      return;
-    }
 
-    replaceDiscussions((current) => current.map((discussionItem) => discussionItem.slug === slug ? {
-      ...discussionItem,
-      messages: [...discussionItem.messages, {
-        id: makeId('reply'),
-        author: {name: replyName.trim() || session?.name || 'Guest', badge: isAdmin ? 'Admin' : 'Member'},
-        text: reply,
-        createdAt: new Date().toISOString()
-      }]
-    } : discussionItem));
-    setReply('<p></p>');
-    setReplyName('');
+    try {
+      const updated = await addReplyApi(slug, {text: reply});
+      replaceDiscussions((current) => current.map((discussionItem) => discussionItem.slug === slug ? updated : discussionItem));
+      setReply('<p></p>');
+    } catch (error) {
+      console.error(`Failed to add reply to discussion ${slug}.`, error);
+    }
   };
 
   const displayed = editing ? draft : discussion;
@@ -259,22 +244,14 @@ export function DiscussionDetailPageClient({initialDiscussions, slug}: {initialD
                 </div>
                 {isSignedIn ? (
                   <div className="space-y-4">
-                    {!IS_LIVE ? (
-                      <input value={replyName} onChange={e => setReplyName(e.target.value)}
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none"
-                        placeholder="Demo uchun ism (ixtiyoriy)" />
-                    ) : (
-                      <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-400/15 text-[10px] font-bold text-cyan-300">
-                          {(session?.name || 'A').charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-sm text-slate-300">
-                          {IS_LIVE
-                            ? `${session?.name || 'Hisobingiz'} sifatida javob qoldirasiz`
-                            : `${session?.name || 'Guest'} sifatida javob qoldirasiz`}
-                        </span>
+                    <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan-400/15 text-[10px] font-bold text-cyan-300">
+                        {(session?.name || 'A').charAt(0).toUpperCase()}
                       </div>
-                    )}
+                      <span className="text-sm text-slate-300">
+                        {`${session?.name || 'Hisobingiz'} sifatida javob qoldirasiz`}
+                      </span>
+                    </div>
                     <RichTextEditor value={reply} onChange={setReply} placeholder="Aniq va foydali javob yozing..." />
                     <button type="button" onClick={submitReply}
                       className="w-full cursor-pointer rounded-2xl bg-cyan-400 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300">

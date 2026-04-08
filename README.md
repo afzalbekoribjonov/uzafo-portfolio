@@ -1,12 +1,12 @@
 # UZAFO Portfolio Site
 
-A polished multilingual portfolio frontend built with **Next.js App Router**, **Tailwind CSS**, **next-intl**, **Tiptap**, and **demo JSON data** that is intentionally structured to be easy to connect to a future **Python API + MongoDB** backend.
+A polished multilingual portfolio frontend built with **Next.js App Router**, **Tailwind CSS**, **next-intl**, and **Tiptap**, now wired for a live **Python API + MongoDB** backend.
 
 ## Highlights
 
 - Responsive UI across home, about, discussion, resume, portfolio, blog, auth, and admin pages
 - Locale-aware routing with **Uzbek** and **English**
-- Mock content stored in isolated JSON files under `src/data`
+- Live content fetched from the configured backend API
 - Data-access layer in `src/lib/data.ts` so the UI does not depend directly on raw JSON
 - Draggable floating AI chat widget
 - Real in-page editing for blog posts, portfolio pages, discussions, and the English-only resume
@@ -77,17 +77,13 @@ messages/
 public/
 ```
 
-## Mock data strategy
+## Live data strategy
 
-The current frontend uses files in `src/data/*.json`.
-
-UI components do **not** read JSON directly. Instead, page code uses helpers from:
+UI components do **not** own content data directly. Instead, page code uses helpers from:
 
 ```txt
 src/lib/data.ts
 ```
-
-Later, these helpers can be replaced with API fetch functions such as:
 
 - `getProjects()` -> fetch from `/api/projects`
 - `getBlogPosts()` -> fetch from `/api/posts`
@@ -110,8 +106,8 @@ Recommended backend stack for the next phase:
 
 ## Notes
 
-- Auth, comments, likes/dislikes, and editor persistence are currently frontend demo flows.
-- The floating AI assistant uses local keyword matching for demo behavior.
+- Auth, comments, likes/dislikes, and editor persistence are expected to go through the backend API.
+- When the backend is unavailable, the app stays on a `Connecting ...` screen until the API responds again.
 - The included API routes are placeholder helpers:
   - `/api/health`
   - `/api/mock-summary`
@@ -152,10 +148,10 @@ public/resume/uzafo-resume-demo.pdf
 ```
 
 
-## Demo admin editing
+## Admin editing
 - `/admin` is now a control room that opens the exact live page you want to edit.
 - Blog posts, portfolio projects, discussions, and the English-only resume are edited directly on their real pages.
-- Demo persistence uses browser localStorage with versioned keys, making it easy to replace with backend repository calls later.
+- Admin edits are synced to the backend and no longer use browser demo persistence.
 
 ## Admin auth
 - Admin access should come only from the backend auth flow.

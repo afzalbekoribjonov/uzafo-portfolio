@@ -143,55 +143,49 @@ export function AdminHomeClient({initialProfile,initialProjects,initialBlogPosts
     const p:BlogPost={slug,title:'Yangi post',excerpt:'Tavsif…',cover:'',publishedAt:new Date().toISOString(),author:{name:profile.name,role:'Developer'},readingTime:1,likes:0,dislikes:0,featured:false,blocks:[{id:makeId('b'),type:'richText',content:'<p>Yozishni boshlang...</p>'}],comments:[]};
     try {
       const created = await createPostApi(p);
-      setPosts([created,...posts]); router.push(`/blog/${created.slug}?edit=1`);
-      return;
-    } catch {}
-    setPosts([p,...posts]); router.push(`/blog/${slug}?edit=1`);
+      replacePosts((current) => [created, ...current]); router.push(`/blog/${created.slug}?edit=1`);
+    } catch (error) {
+      console.error('Failed to create post.', error);
+    }
   };
   const createProject = async () => {
     const slug=`project-${Date.now()}`;
     const p=normalizeProject({slug,title:'Yangi loyiha',excerpt:'Tavsif.',description:'Loyiha haqida.',year:String(new Date().getUTCFullYear()),status:'Draft',cover:'',tags:['Next.js'],metrics:[{label:'Role',value:'Developer'}],links:[{id:makeId('l'),label:'Demo',href:'#'}],content:[{id:makeId('b'),type:'richText',content:'<p>Loyiha tavsifi</p>'}]});
     try {
       const created = await createProjectApi(p);
-      setProjects([created,...projects]); router.push(`/portfolio/${created.slug}?edit=1`);
-      return;
-    } catch {}
-    setProjects([p,...projects]); router.push(`/portfolio/${slug}?edit=1`);
+      replaceProjects((current) => [created, ...current]); router.push(`/portfolio/${created.slug}?edit=1`);
+    } catch (error) {
+      console.error('Failed to create project.', error);
+    }
   };
   const createDiscussion = async () => {
     const slug=slugify(`discussion-${Date.now()}`);
     const d:Discussion={slug,title:'Yangi muhokama',category:'General',createdAt:new Date().toISOString(),author:{name:session?.name||profile.name,avatar:'/assets/avatars/uzafo-avatar.svg',title:'Admin'},summary:'Tavsif.',content:'<p>Muhokamani boshlang…</p>',messages:[]};
     try {
       const created = await createDiscussionApi(d);
-      setDiscussions([created,...discussions]); router.push(`/discussions/${created.slug}?edit=1`);
-      return;
-    } catch {}
-    setDiscussions([d,...discussions]); router.push(`/discussions/${slug}?edit=1`);
+      replaceDiscussions((current) => [created, ...current]); router.push(`/discussions/${created.slug}?edit=1`);
+    } catch (error) {
+      console.error('Failed to create discussion.', error);
+    }
   };
   const doDelete = async () => {
     if (!confirm) return;
-    if (isLiveModeEnabled()) {
-      try {
-        if (confirm.type==='post') {
-          await deletePostApi(confirm.slug);
-          replacePosts((current) => current.filter((post) => post.slug !== confirm.slug));
-        }
-        if (confirm.type==='project') {
-          await deleteProjectApi(confirm.slug);
-          replaceProjects((current) => current.filter((project) => project.slug !== confirm.slug));
-        }
-        if (confirm.type==='disc') {
-          await deleteDiscussionApi(confirm.slug);
-          replaceDiscussions((current) => current.filter((discussion) => discussion.slug !== confirm.slug));
-        }
-      } catch (error) {
-        console.error(`Failed to delete ${confirm.type} ${confirm.slug}.`, error);
-        return;
+    try {
+      if (confirm.type==='post') {
+        await deletePostApi(confirm.slug);
+        replacePosts((current) => current.filter((post) => post.slug !== confirm.slug));
       }
-    } else {
-      if (confirm.type==='post') setPosts(posts.filter(p=>p.slug!==confirm.slug));
-      if (confirm.type==='project') setProjects(projects.filter(p=>p.slug!==confirm.slug));
-      if (confirm.type==='disc') setDiscussions(discussions.filter(d=>d.slug!==confirm.slug));
+      if (confirm.type==='project') {
+        await deleteProjectApi(confirm.slug);
+        replaceProjects((current) => current.filter((project) => project.slug !== confirm.slug));
+      }
+      if (confirm.type==='disc') {
+        await deleteDiscussionApi(confirm.slug);
+        replaceDiscussions((current) => current.filter((discussion) => discussion.slug !== confirm.slug));
+      }
+    } catch (error) {
+      console.error(`Failed to delete ${confirm.type} ${confirm.slug}.`, error);
+      return;
     }
     setConfirm(null);
   };

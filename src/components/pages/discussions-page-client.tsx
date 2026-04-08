@@ -88,7 +88,7 @@ export function DiscussionsPageClient({initialDiscussions}: {initialDiscussions:
   const t = useTranslations('discussions');
   const router = useRouter();
   const {session, isSignedIn} = useDemoSession();
-  const [discussions, setDiscussions] = useManagedDiscussions(initialDiscussions);
+  const [discussions, , , replaceDiscussions] = useManagedDiscussions(initialDiscussions);
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -120,12 +120,11 @@ export function DiscussionsPageClient({initialDiscussions}: {initialDiscussions:
     };
     try {
       const created = await createDiscussionApi(d);
-      setDiscussions([created, ...ordered]);
+      replaceDiscussions((current) => [created, ...current]);
       router.push(`/discussions/${created.slug}`);
-      return;
-    } catch {}
-    setDiscussions([d, ...ordered]);
-    router.push(`/discussions/${d.slug}`);
+    } catch (error) {
+      console.error('Failed to create discussion.', error);
+    }
   };
 
   return (
