@@ -20,7 +20,8 @@ export default function GlobalError({
               className="mt-8 rounded-full bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950"
               onClick={() => reset()}
             >
-              Try again
+
+              Try again !
             </button>
           </div>
         </main>
