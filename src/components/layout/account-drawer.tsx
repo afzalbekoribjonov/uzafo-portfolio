@@ -1,10 +1,12 @@
 'use client';
 
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
-import {LogOut, Mail, X} from 'lucide-react';
+import {LogOut, Mail, Moon, Sun, X} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
+import {createPortal} from 'react-dom';
 import {useTranslations} from 'next-intl';
 import {fetchDiscussions, fetchPosts} from '@/lib/api-service';
+import {useTheme} from '@/lib/theme';
 import type {DemoSession} from '@/lib/types';
 import {cn} from '@/lib/utils';
 
@@ -40,12 +42,18 @@ export function AccountDrawer({
   onSignOut: () => void;
 }) {
   const t = useTranslations('account');
+  const {isDark, theme, toggle} = useTheme();
   const prefersReducedMotion = useReducedMotion();
   const [liveActivity, setLiveActivity] = useState(activity);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setLiveActivity(activity);
   }, [activity]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -95,15 +103,17 @@ export function AccountDrawer({
     ? {duration: 0}
     : {type: 'spring' as const, stiffness: 360, damping: 34, mass: 0.9};
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && session ? (
-        <>
+        <div className="pointer-events-none fixed inset-0 z-[120] overflow-hidden">
           <motion.button
             key="account-backdrop"
             type="button"
             aria-label={t('close')}
-            className="fixed inset-0 z-[69] bg-black/50 backdrop-blur-[2px]"
+            className="pointer-events-auto absolute inset-0 bg-black/55 backdrop-blur-sm"
             initial={{opacity: 0}}
             animate={{opacity: 1}}
             exit={{opacity: 0}}
@@ -115,13 +125,14 @@ export function AccountDrawer({
             role="dialog"
             aria-modal="true"
             aria-labelledby="account-drawer-title"
-            className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-sm flex-col border-l border-white/10 bg-slate-950/90 shadow-2xl backdrop-blur-2xl sm:max-w-md"
+            className="pointer-events-auto absolute inset-y-0 right-0 flex w-full max-w-sm flex-col border-l border-white/10 shadow-[0_24px_90px_rgba(2,6,23,0.38)] sm:max-w-md"
+            style={{background: 'var(--elevated)'}}
             initial={{x: prefersReducedMotion ? 0 : 28, opacity: prefersReducedMotion ? 1 : 0}}
             animate={{x: 0, opacity: 1}}
             exit={{x: prefersReducedMotion ? 0 : 28, opacity: prefersReducedMotion ? 1 : 0}}
             transition={animation}
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6" style={{background: 'var(--elevated)'}}>
               <h2 id="account-drawer-title" className="text-base font-semibold" style={{color: 'var(--text-1)'}}>
                 {t('title')}
               </h2>
@@ -155,6 +166,31 @@ export function AccountDrawer({
               </div>
 
               <div className="mt-5 space-y-4">
+                <div className="rounded-[28px] border border-white/10 bg-white/5 p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{color: 'var(--text-4)'}}>
+                        {t('theme')}
+                      </p>
+                      <p className="mt-3 text-lg font-semibold" style={{color: 'var(--text-1)'}}>
+                        {isDark ? t('themeDark') : t('themeLight')}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={toggle}
+                      aria-label={t('themeAction')}
+                      className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-slate-950/60 transition hover:bg-slate-950/80"
+                      style={{color: 'var(--text-3)'}}
+                    >
+                      {theme === 'dark' ? <Sun className="h-5 w-5 text-cyan-300" /> : <Moon className="h-5 w-5 text-cyan-300" />}
+                    </button>
+                  </div>
+                  <p className="mt-4 text-sm leading-6" style={{color: 'var(--text-3)'}}>
+                    {t('themeAction')}
+                  </p>
+                </div>
+
                 <div className="rounded-[28px] border border-white/10 bg-white/5 p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -210,8 +246,10 @@ export function AccountDrawer({
               </button>
             </div>
           </motion.aside>
-        </>
+        </div>
       ) : null}
     </AnimatePresence>
+    ,
+    document.body
   );
 }
