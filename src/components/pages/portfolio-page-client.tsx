@@ -2,8 +2,9 @@
 
 import {ArrowRight, ExternalLink, Plus, Trash2} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Link, useRouter} from '@/i18n/navigation';
+import {isPublicPortfolioProject} from '@/components/pages/portfolio-project-helpers';
 import {DynamicMedia} from '@/components/ui/dynamic-media';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
@@ -21,6 +22,10 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
   const {isAdmin} = useDemoSession();
   const [projects, , , replaceProjects] = useManagedProjects(initialProjects);
   const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+  const visibleProjects = useMemo(
+    () => isAdmin ? projects : projects.filter(isPublicPortfolioProject),
+    [isAdmin, projects]
+  );
 
   const createProject = async () => {
     const slug = `project-${Date.now()}`;
@@ -62,11 +67,11 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
       {confirmSlug ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-[24px] border border-rose-400/20 bg-slate-900 p-6 shadow-2xl">
-            <p className="font-semibold text-white">Loyihani o'chirish</p>
-            <p className="mt-2 text-sm text-slate-300">Bu amalni qaytarib bo'lmaydi.</p>
+            <p className="font-semibold text-white">Loyihani o&apos;chirish</p>
+            <p className="mt-2 text-sm text-slate-300">Bu amalni qaytarib bo&apos;lmaydi.</p>
             <div className="mt-4 flex justify-end gap-2">
               <button type="button" onClick={() => setConfirmSlug(null)} className="cursor-pointer rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10">Bekor</button>
-              <button type="button" onClick={() => deleteProject(confirmSlug)} className="cursor-pointer rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400">O'chirish</button>
+              <button type="button" onClick={() => deleteProject(confirmSlug)} className="cursor-pointer rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400">O&apos;chirish</button>
             </div>
           </div>
         </div>
@@ -78,7 +83,7 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
         <Container className="space-y-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <span className="rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm text-slate-300">
-              {projects.length} ta loyiha
+              {visibleProjects.length} ta loyiha
             </span>
             {isAdmin ? (
               <button
@@ -92,18 +97,19 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
           </div>
 
           <div className="space-y-6">
-            {projects.map((project, idx) => (
+            {visibleProjects.map((project, idx) => (
               <article
                 key={project.slug}
                 className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 transition hover:border-white/15"
               >
                 <div className={`grid gap-0 ${idx % 2 === 0 ? 'lg:grid-cols-[380px_1fr]' : 'lg:grid-cols-[1fr_380px]'}`}>
                   {/* Cover - left on even, right on odd */}
-                  <div className={`relative min-h-[220px] overflow-hidden lg:min-h-0 ${idx % 2 !== 0 ? 'order-2 lg:order-2' : ''}`}>
+                  <div className={`relative min-h-[220px] overflow-hidden aspect-[16/10] lg:aspect-auto lg:min-h-0 ${idx % 2 !== 0 ? 'order-2 lg:order-2' : ''}`}>
                     <DynamicMedia
                       src={project.cover}
                       alt={resolveText(project.title, locale)}
                       className="h-full"
+                      controls={false}
                       mediaClassName="h-full min-h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                       placeholderTitle={resolveText(project.title, locale)}
                       placeholderHint=""
@@ -128,7 +134,7 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
                         <h2 className="text-2xl font-semibold text-white lg:text-3xl">
                           {resolveText(project.title, locale)}
                         </h2>
-                        <p className="mt-3 text-sm leading-7 text-slate-300">
+                        <p className="mt-3 overflow-hidden text-sm leading-7 text-slate-300 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:5]">
                           {resolveText(project.description, locale)}
                         </p>
                       </div>
@@ -140,7 +146,7 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
                         ))}
                       </div>
                       {/* Metrics */}
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                         {project.metrics.slice(0,3).map((m, i) => (
                           <div key={i} className="rounded-[16px] border border-white/8 bg-slate-950/40 p-3">
                             <p className="text-[10px] uppercase tracking-wide text-slate-500">{resolveText(m.label, locale)}</p>
@@ -174,7 +180,7 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
 
                 {/* Admin quick-actions */}
                 {isAdmin ? (
-                  <div className="absolute right-4 top-4 flex items-center gap-1.5 opacity-0 transition group-hover:opacity-100">
+                  <div className="absolute right-4 top-4 flex items-center gap-1.5 opacity-100 transition lg:opacity-0 lg:group-hover:opacity-100">
                     <Link
                       href={`/portfolio/${project.slug}?edit=1`}
                       className="rounded-full border border-cyan-300/20 bg-slate-900/90 px-3 py-1.5 text-xs font-medium text-cyan-300 backdrop-blur transition hover:bg-cyan-400/10"
@@ -195,12 +201,12 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
             ))}
           </div>
 
-          {projects.length === 0 ? (
+          {visibleProjects.length === 0 ? (
             <div className="rounded-[28px] border border-dashed border-white/10 py-16 text-center">
-              <p className="text-base font-medium text-slate-300">Hali loyiha yo'q</p>
+              <p className="text-base font-medium text-slate-300">Hali loyiha yo&apos;q</p>
               {isAdmin ? (
                 <button type="button" onClick={createProject} className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
-                  <Plus className="h-4 w-4" /> Birinchi loyihani qo'shing
+                  <Plus className="h-4 w-4" /> Birinchi loyihani qo&apos;shing
                 </button>
               ) : null}
             </div>
