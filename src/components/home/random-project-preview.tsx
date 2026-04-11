@@ -18,16 +18,17 @@ export function RandomProjectPreview({project}: RandomProjectPreviewProps) {
   const locale = useLocale() as Locale;
   const projectSummary = resolveLocaleText(project.excerpt, locale) || resolveLocaleText(project.description, locale);
   const highlightMetrics = project.metrics.slice(0, 2);
+  const visibleTags = project.tags.slice(0, 6);
 
   return (
     <section
-      className="overflow-hidden rounded-[36px] border"
+      className="overflow-hidden rounded-[32px] border"
       style={{borderColor: 'var(--border-1)', background: 'var(--surface-1)'}}
     >
-      <div className="grid gap-0 lg:grid-cols-[1.02fr_0.98fr]">
-        <div className="order-2 p-6 sm:p-8 lg:order-1">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{borderColor: 'var(--border-1)', background: 'var(--elevated)', color: 'var(--accent)'}}>
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)]">
+        <div className="order-2 p-5 sm:p-6 lg:order-1 lg:p-7">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.2em]" style={{borderColor: 'var(--border-1)', background: 'var(--elevated)', color: 'var(--accent)'}}>
               <Sparkles className="h-4 w-4" />
               {home('spotlightTitle')}
             </div>
@@ -42,21 +43,21 @@ export function RandomProjectPreview({project}: RandomProjectPreviewProps) {
             <span>{resolveLocaleText(project.status, locale)}</span>
           </div>
 
-          <h3 className="mt-4 text-2xl font-semibold sm:text-[2rem]" style={{color: 'var(--text-1)'}}>
+          <h3 className="mt-3 text-[1.85rem] font-semibold leading-tight sm:text-[2.15rem]" style={{color: 'var(--text-1)'}}>
             {resolveLocaleText(project.title, locale)}
           </h3>
-          <p className="mt-4 max-w-2xl text-sm leading-7 sm:text-base" style={{color: 'var(--text-3)'}}>
+          <p className="mt-4 max-w-xl text-sm leading-7 sm:text-[15px]" style={{color: 'var(--text-3)'}}>
             {projectSummary}
           </p>
-          <p className="mt-3 text-sm leading-7" style={{color: 'var(--text-4)'}}>
+          <p className="mt-2 text-sm leading-6" style={{color: 'var(--text-4)'}}>
             {home('spotlightSubtitle')}
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.tags.slice(0, 8).map((tag) => (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {visibleTags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border px-3 py-1.5 text-xs"
+                className="rounded-full border px-3 py-1.5 text-[11px]"
                 style={{borderColor: 'var(--border-1)', background: 'var(--elevated)', color: 'var(--text-2)'}}
               >
                 {tag}
@@ -65,17 +66,17 @@ export function RandomProjectPreview({project}: RandomProjectPreviewProps) {
           </div>
 
           {highlightMetrics.length ? (
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid max-w-xl gap-3 sm:grid-cols-2">
               {highlightMetrics.map((metric) => (
                 <div
                   key={`${resolveLocaleText(metric.label, locale)}-${metric.value}`}
-                  className="rounded-[22px] border p-4"
+                  className="rounded-[22px] border px-4 py-3.5"
                   style={{borderColor: 'var(--border-1)', background: 'var(--elevated)'}}
                 >
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{color: 'var(--text-4)'}}>
                     {resolveLocaleText(metric.label, locale)}
                   </p>
-                  <p className="mt-2 text-lg font-semibold" style={{color: 'var(--text-1)'}}>
+                  <p className="mt-1.5 text-base font-semibold sm:text-lg" style={{color: 'var(--text-1)'}}>
                     {metric.value}
                   </p>
                 </div>
@@ -83,7 +84,7 @@ export function RandomProjectPreview({project}: RandomProjectPreviewProps) {
             </div>
           ) : null}
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={`/portfolio/${project.slug}`}
               className="inline-flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5"
@@ -102,12 +103,13 @@ export function RandomProjectPreview({project}: RandomProjectPreviewProps) {
           </div>
         </div>
 
-        <div className="order-1 border-b p-4 sm:p-5 lg:order-2 lg:border-l lg:border-b-0" style={{borderColor: 'var(--border-1)'}}>
-          <div className="h-full overflow-hidden rounded-[28px]" style={{background: 'var(--elevated)'}}>
+        <div className="order-1 border-b p-4 sm:p-5 lg:order-2 lg:flex lg:items-center lg:border-l lg:border-b-0 lg:p-5" style={{borderColor: 'var(--border-1)'}}>
+          <div className="relative w-full overflow-hidden rounded-[26px] border" style={{borderColor: 'var(--border-1)', background: 'var(--elevated)'}}>
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-slate-950/25 via-transparent to-transparent" />
             <DynamicMedia
               src={project.cover}
               alt={resolveLocaleText(project.title, locale)}
-              className="min-h-[280px] h-full sm:min-h-[340px]"
+              className="aspect-[16/11] w-full"
               mediaClassName="h-full w-full object-cover"
               placeholderTitle={home('placeholders.projectTitle')}
               placeholderHint={home('placeholders.projectHint')}
