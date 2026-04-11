@@ -92,7 +92,10 @@
     "title": "Portfolio",
     "subtitle": "Muammolarni yechishga qaratilgan amaliy loyihalar to‘plami.",
     "projectMetrics": "Loyiha ko‘rsatkichlari",
-    "openProject": "Loyihani ko‘rish"
+    "openProject": "Loyihani ko‘rish",
+    "overview": "Qisqacha",
+    "techStack": "Texnologiyalar",
+    "projectLinks": "Loyiha linklari"
   },
   "blog": {
     "title": "Blog",

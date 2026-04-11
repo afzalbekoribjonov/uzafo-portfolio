@@ -92,7 +92,10 @@
     "title": "Portfolio",
     "subtitle": "A collection of practical projects focused on solving real problems.",
     "projectMetrics": "Project metrics",
-    "openProject": "Open project"
+    "openProject": "Open project",
+    "overview": "Overview",
+    "techStack": "Tech stack",
+    "projectLinks": "Project links"
   },
   "blog": {
     "title": "Blog",
