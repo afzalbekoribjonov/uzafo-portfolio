@@ -49,6 +49,17 @@ function isRoleMetric(metric: ProjectMetric, locale: Locale) {
   return label === 'role' || label === 'rol' || label.includes('role') || label.includes('rol');
 }
 
+function getPortfolioLinkCaption(href: string) {
+  const value = href.trim();
+  if (!value) return '';
+  try {
+    const normalized = /^https?:\/\//i.test(value) ? value : `https://${value.replace(/^\/+/, '')}`;
+    return new URL(normalized).hostname.replace(/^www\./i, '');
+  } catch {
+    return value.replace(/^https?:\/\//i, '').replace(/^www\./i, '');
+  }
+}
+
 export function PortfolioDetailClient({initialProjects, slug}: {initialProjects: Project[]; slug: string}) {
   const locale = useLocale() as Locale;
   const t = useTranslations('portfolio');
@@ -314,10 +325,16 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
                               href={linkItem.href}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex min-w-0 items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-white transition hover:border-cyan-300/20 hover:bg-slate-950/70 hover:text-cyan-200"
+                              className="group inline-flex min-w-0 items-center justify-between gap-3 rounded-[22px] border px-4 py-3.5 text-sm transition hover:-translate-y-0.5"
+                              style={{borderColor: 'var(--border-1)', background: 'var(--surface-2)', color: 'var(--text-2)'}}
                             >
-                              <span className="min-w-0 truncate">{linkItem.label}</span>
-                              <ExternalLink className="h-4 w-4 shrink-0 text-cyan-300" />
+                              <div className="min-w-0">
+                                <p className="truncate font-medium" style={{color: 'var(--text-1)'}}>{linkItem.label}</p>
+                                <p className="mt-1 truncate text-xs" style={{color: 'var(--text-4)'}}>{getPortfolioLinkCaption(linkItem.href)}</p>
+                              </div>
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition" style={{background: 'var(--accent-m)', color: 'var(--accent)'}}>
+                                <ExternalLink className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                              </span>
                             </a>
                           ))}
                         </div>

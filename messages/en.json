@@ -54,8 +54,59 @@
     "ctaPrimary": "View portfolio",
     "ctaSecondary": "Open resume",
     "rolePrefix": "uzafo",
+    "roleTitles": {
+      "frontend": "Frontend Developer",
+      "backend": "Backend Developer",
+      "ai": "AI Integrations Engineer"
+    },
+    "heroHighlights": {
+      "systems": "Responsive systems",
+      "product": "Product thinking",
+      "automation": "AI automation"
+    },
+    "heroFactYear": "Year",
+    "heroFactStack": "Stack",
+    "heroFactFocus": "Focus",
+    "heroFactYearValue": "2026",
+    "heroFactStackValue": "Next.js / Python",
+    "heroFactFocusValue": "Product systems",
     "sectionsTitle": "Core sections",
     "sectionsSubtitle": "Each section is organized to show my approach, experience, and practical results at a glance.",
+    "exploreTitle": "The clearest ways to explore the site",
+    "exploreSubtitle": "Each entry point is arranged to surface the most useful parts of my work quickly.",
+    "showcaseTitle": "Recent work and thinking",
+    "showcaseSubtitle": "Selected previews from projects, writing, and ongoing discussions.",
+    "quickLinks": {
+      "portfolio": {
+        "kicker": "Case studies",
+        "title": "Portfolio",
+        "description": "Practical projects, outcomes, and technical decisions."
+      },
+      "blog": {
+        "kicker": "Writing",
+        "title": "Blog",
+        "description": "Notes on systems, frontend, backend, and implementation work."
+      },
+      "about": {
+        "kicker": "Profile",
+        "title": "About",
+        "description": "A concise view of my technologies, experience, and working style."
+      }
+    },
+    "spotlightTitle": "Case study spotlight",
+    "spotlightSubtitle": "A closer look at product thinking, technical choices, and practical impact.",
+    "availabilityBadge": "Availability",
+    "availabilityTitle": "Open for freelance, product, and selected collaboration work.",
+    "availabilitySubtitle": "You can reach out for fast scoping, direct communication, and flexible working formats.",
+    "availabilityEmail": "Email",
+    "availabilityPhone": "Phone",
+    "availabilityLocation": "Location",
+    "placeholders": {
+      "projectTitle": "This project does not have a cover yet",
+      "projectHint": "The preview still works, and media can be added inside the project later.",
+      "blogTitle": "The latest article has no cover yet",
+      "blogHint": "A cover is optional, so the preview still stays readable."
+    },
     "roleDescriptions": {
       "frontend": "Clean UI systems, reusable components, and modern web experiences.",
       "backend": "API architecture, data flow design, and deployment workflows.",

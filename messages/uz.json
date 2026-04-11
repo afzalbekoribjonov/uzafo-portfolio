@@ -54,8 +54,59 @@
     "ctaPrimary": "Portfolio ko‘rish",
     "ctaSecondary": "Resume ochish",
     "rolePrefix": "uzafo",
+    "roleTitles": {
+      "frontend": "Frontend Developer",
+      "backend": "Backend Developer",
+      "ai": "AI Integrations Engineer"
+    },
+    "heroHighlights": {
+      "systems": "Responsive tizimlar",
+      "product": "Product fikrlash",
+      "automation": "AI automation"
+    },
+    "heroFactYear": "Yil",
+    "heroFactStack": "Stack",
+    "heroFactFocus": "Yo‘nalish",
+    "heroFactYearValue": "2026",
+    "heroFactStackValue": "Next.js / Python",
+    "heroFactFocusValue": "Product systems",
     "sectionsTitle": "Asosiy bo‘limlar",
     "sectionsSubtitle": "Har bir bo‘lim ish uslubim, tajribam va amaliy natijalarni tez ko‘rsatish uchun tartiblangan.",
+    "exploreTitle": "Saytdagi eng muhim yo‘nalishlar",
+    "exploreSubtitle": "Har bir kirish nuqtasi ish uslubim, tajribam va amaliy natijalarni tez ko‘rsatish uchun qayta tartiblangan.",
+    "showcaseTitle": "So‘nggi ishlar va fikrlar",
+    "showcaseSubtitle": "Loyihalar, yozuvlar va muhokamalardan tanlangan preview bloklari.",
+    "quickLinks": {
+      "portfolio": {
+        "kicker": "Case studies",
+        "title": "Portfolio",
+        "description": "Amaliy loyihalar, natijalar va texnik qarorlar."
+      },
+      "blog": {
+        "kicker": "Writing",
+        "title": "Blog",
+        "description": "Tizimlar, frontend va backend tajribalaridan yozuvlar."
+      },
+      "about": {
+        "kicker": "Profile",
+        "title": "Haqimda",
+        "description": "Texnologiyalar, tajriba va ish uslubimning umumiy ko‘rinishi."
+      }
+    },
+    "spotlightTitle": "Case study spotlight",
+    "spotlightSubtitle": "Mahsulot fikrlashi, texnik qarorlar va real foyda bir joyda.",
+    "availabilityBadge": "Hamkorlik",
+    "availabilityTitle": "Freelance, product va tanlangan hamkorliklar uchun ochiqman.",
+    "availabilitySubtitle": "Tez aloqa, aniq scope va ishlash formati bo‘yicha bog‘lanishingiz mumkin.",
+    "availabilityEmail": "Email",
+    "availabilityPhone": "Telefon",
+    "availabilityLocation": "Joylashuv",
+    "placeholders": {
+      "projectTitle": "Bu loyiha uchun hali cover biriktirilmagan",
+      "projectHint": "Preview baribir ishlaydi, lekin loyiha ichida media qo‘shish mumkin.",
+      "blogTitle": "So‘nggi maqola uchun cover yo‘q",
+      "blogHint": "Cover majburiy emas, preview baribir ko‘rsatiladi."
+    },
     "roleDescriptions": {
       "frontend": "Toza UI tizimlari, reusable komponentlar va zamonaviy web tajribalari.",
       "backend": "API arxitekturasi, ma’lumot oqimi va deploy jarayonlari bilan ishlash.",

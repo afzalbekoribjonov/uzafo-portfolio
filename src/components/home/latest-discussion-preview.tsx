@@ -1,9 +1,8 @@
 'use client';
 
-import {MessageSquareMore} from 'lucide-react';
+import {MessageSquareMore, MessagesSquare} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import {ButtonLink} from '@/components/ui/button-link';
-import {SectionHeading} from '@/components/ui/section-heading';
 import {Link} from '@/i18n/navigation';
 import {formatDateTime, initials, resolveLocaleText, stripHtml} from '@/lib/utils';
 import type {Discussion, Locale} from '@/lib/types';
@@ -18,44 +17,88 @@ export function LatestDiscussionPreview({discussion}: LatestDiscussionPreviewPro
   const latestMessage = discussion.messages.at(-1);
 
   return (
-    <section className="rounded-[32px] border border-white/10 bg-white/5 p-6">
-      <SectionHeading title={t('latestDiscussion')} action={<ButtonLink href="/discussions" variant="ghost">{t('viewAll')}</ButtonLink>} />
-      <div className="rounded-[28px] border border-white/10 bg-slate-950/70 p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
-              {resolveLocaleText(discussion.category, locale)}
-            </p>
-            <h3 className="text-xl font-semibold text-white">{resolveLocaleText(discussion.title, locale)}</h3>
-            <p className="max-w-3xl text-sm leading-7 text-slate-300">{resolveLocaleText(discussion.summary, locale)}</p>
+    <section
+      className="overflow-hidden rounded-[36px] border"
+      style={{borderColor: 'var(--border-1)', background: 'var(--surface-1)'}}
+    >
+      <div className="grid gap-0 lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="border-b p-6 sm:p-8 lg:border-r lg:border-b-0" style={{borderColor: 'var(--border-1)'}}>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{borderColor: 'var(--border-1)', background: 'var(--elevated)', color: 'var(--accent)'}}>
+              <MessagesSquare className="h-4 w-4" />
+              {t('latestDiscussion')}
+            </div>
+            <ButtonLink href="/discussions" variant="ghost">
+              {t('viewAll')}
+            </ButtonLink>
           </div>
-          <div className="hidden rounded-2xl border border-white/10 bg-white/5 p-3 md:block">
-            <MessageSquareMore className="h-7 w-7 text-cyan-300" />
+
+          <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{color: 'var(--text-4)'}}>
+            {resolveLocaleText(discussion.category, locale)}
+          </p>
+          <h3 className="mt-3 text-2xl font-semibold sm:text-[2rem]" style={{color: 'var(--text-1)'}}>
+            {resolveLocaleText(discussion.title, locale)}
+          </h3>
+          <p className="mt-4 max-w-2xl text-sm leading-7 sm:text-base" style={{color: 'var(--text-3)'}}>
+            {resolveLocaleText(discussion.summary, locale)}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3 text-sm" style={{color: 'var(--text-3)'}}>
+            <span className="inline-flex items-center gap-2 rounded-full border px-3.5 py-2" style={{borderColor: 'var(--border-1)', background: 'var(--elevated)'}}>
+              <MessageSquareMore className="h-4 w-4" style={{color: 'var(--accent)'}} />
+              {discussion.messages.length} {t('messages')}
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border px-3.5 py-2" style={{borderColor: 'var(--border-1)', background: 'var(--elevated)'}}>
+              {discussion.author.name}
+            </span>
+          </div>
+
+          <div className="mt-8">
+            <Link
+              href={`/discussions/${discussion.slug}`}
+              className="inline-flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5"
+              style={{background: 'var(--accent)', color: 'var(--accent-fg)'}}
+            >
+              {t('openDiscussion')}
+            </Link>
           </div>
         </div>
 
-        {latestMessage ? (
-          <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-300">
-                {initials(latestMessage.author.name)}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">{latestMessage.author.name}</p>
-                <p className="text-xs text-slate-400">{formatDateTime(latestMessage.createdAt, locale)}</p>
-              </div>
-            </div>
-            <p className="mt-4 text-sm leading-7 text-slate-300">{stripHtml(resolveLocaleText(latestMessage.text, locale))}</p>
-          </div>
-        ) : null}
-
-        <div className="mt-6">
-          <Link
-            href={`/discussions/${discussion.slug}`}
-            className="inline-flex cursor-pointer items-center rounded-full border border-white/10 bg-white/8 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/12"
+        <div className="p-6 sm:p-8">
+          <div
+            className="rounded-[28px] border p-5 sm:p-6"
+            style={{borderColor: 'var(--border-1)', background: 'var(--elevated)'}}
           >
-            {t('openDiscussion')}
-          </Link>
+            {latestMessage ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-semibold" style={{background: 'var(--accent-m)', color: 'var(--accent)'}}>
+                    {initials(latestMessage.author.name)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold" style={{color: 'var(--text-1)'}}>
+                      {latestMessage.author.name}
+                    </p>
+                    <p className="text-xs" style={{color: 'var(--text-4)'}}>
+                      {formatDateTime(latestMessage.createdAt, locale)}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-5 text-sm leading-7 sm:text-base" style={{color: 'var(--text-2)'}}>
+                  {stripHtml(resolveLocaleText(latestMessage.text, locale))}
+                </p>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm font-semibold" style={{color: 'var(--text-1)'}}>
+                  {resolveLocaleText(discussion.title, locale)}
+                </p>
+                <p className="text-sm leading-7" style={{color: 'var(--text-3)'}}>
+                  {resolveLocaleText(discussion.content, locale)}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
