@@ -3,6 +3,7 @@ import {hasLocale, NextIntlClientProvider} from 'next-intl';
 import {getMessages, setRequestLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {BackendConnectingScreen} from '@/components/system/backend-connecting-screen';
+import type {BlogPost, Discussion} from '@/lib/types';
 import {SiteFooter} from '@/components/layout/site-footer';
 import {SiteHeader} from '@/components/layout/site-header';
 import {routing} from '@/i18n/routing';
@@ -17,6 +18,20 @@ import {
   probeBackendHealth
 } from '@/lib/data';
 
+function buildHeaderActivity(blogPosts: BlogPost[], discussions: Discussion[]) {
+  return {
+    commentAuthors: blogPosts.flatMap((post) => post.comments.map((comment) => comment.author)),
+    discussionParticipants: discussions.map((discussion) => {
+      const participants = new Set<string>();
+      if (discussion.author.name.trim()) participants.add(discussion.author.name);
+      discussion.messages.forEach((message) => {
+        if (message.author.name.trim()) participants.add(message.author.name);
+      });
+      return [...participants];
+    })
+  };
+}
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
 }
@@ -30,10 +45,11 @@ export default async function LocaleLayout({children, params}: {children: ReactN
   const messages = await getMessages();
 
   let isBackendReady = true;
+  let headerActivity = {commentAuthors: [] as string[], discussionParticipants: [] as string[][]};
 
   try {
     await probeBackendHealth();
-    await Promise.all([
+    const [, , , blogPosts, discussions] = await Promise.all([
       getSite(),
       getProfile(),
       getProjects(),
@@ -41,6 +57,7 @@ export default async function LocaleLayout({children, params}: {children: ReactN
       getDiscussions(),
       getResume()
     ]);
+    headerActivity = buildHeaderActivity(blogPosts, discussions);
   } catch (error) {
     if (error instanceof BackendUnavailableError) {
       isBackendReady = false;
@@ -66,7 +83,7 @@ export default async function LocaleLayout({children, params}: {children: ReactN
             }}
           />
           <div className="relative z-10 flex flex-1 flex-col">
-            <SiteHeader />
+            <SiteHeader accountActivity={headerActivity} />
             <main className="flex-1">{children}</main>
             <SiteFooter />
           </div>

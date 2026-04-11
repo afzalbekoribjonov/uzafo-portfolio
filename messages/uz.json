@@ -115,6 +115,17 @@
     "newHere": "Ro‘yxatdan o‘tmaganmisiz?",
     "alreadyHave": "Hisobingiz bormi?"
   },
+  "account": {
+    "title": "Akkaunt",
+    "open": "Akkaunt panelini ochish",
+    "close": "Akkaunt panelini yopish",
+    "email": "Email",
+    "comments": "Kommentlar",
+    "discussions": "Muhokamalar",
+    "commentsEmpty": "Siz hali comment yozmadingiz",
+    "discussionsEmpty": "Siz hali muhokamada qatnashmadingiz",
+    "signOut": "Akkauntdan chiqish"
+  },
   "admin": {
     "title": "Admin boshqaruvi",
     "subtitle": "Sahifa mazmuni, resume va blog postlarni bir joydan boshqarish.",
