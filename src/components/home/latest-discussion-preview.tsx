@@ -15,6 +15,7 @@ export function LatestDiscussionPreview({discussion}: LatestDiscussionPreviewPro
   const t = useTranslations('common');
   const locale = useLocale() as Locale;
   const latestMessage = discussion.messages.at(-1);
+  const discussionPreview = stripHtml(resolveLocaleText(discussion.content, locale));
 
   return (
     <section
@@ -93,8 +94,8 @@ export function LatestDiscussionPreview({discussion}: LatestDiscussionPreviewPro
                 <p className="text-sm font-semibold" style={{color: 'var(--text-1)'}}>
                   {resolveLocaleText(discussion.title, locale)}
                 </p>
-                <p className="text-sm leading-7" style={{color: 'var(--text-3)'}}>
-                  {resolveLocaleText(discussion.content, locale)}
+                <p className="line-clamp-6 text-sm leading-7" style={{color: 'var(--text-3)'}}>
+                  {discussionPreview}
                 </p>
               </div>
             )}
