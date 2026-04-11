@@ -155,32 +155,41 @@ function DonutChart() {
   const cy = 70
   const circ = 2 * Math.PI * r
   let acc = 0
+  const segments = segs.map((segment) => {
+    const dash = (segment.p / 100) * circ
+    const offset = circ - (acc / 100) * circ
+    acc += segment.p
+    return {
+      ...segment,
+      dash,
+      gap: circ - dash,
+      offset,
+    }
+  })
 
   return (
     <div className="flex flex-col items-center gap-4">
       <motion.svg width="140" height="140" viewBox="0 0 140 140" initial={prefersReducedMotion ? {opacity: 1, scale: 1} : {opacity: 0, scale: 0.94}} whileInView={{opacity: 1, scale: 1}} viewport={{once: true, amount: 0.65}} transition={revealTransition(prefersReducedMotion, 0.08, 0.4)}>
-        {segs.map((segment, index) => {
-          const rot = (acc / 100) * 360 - 90
-          acc += segment.p
-          return (
-            <motion.circle
-              key={segment.l}
-              cx={cx}
-              cy={cy}
-              r={r}
-              fill="none"
-              stroke={segment.c}
-              strokeWidth="16"
-              strokeDasharray={`${(segment.p / 100) * circ} ${circ}`}
-              transform={`rotate(${rot} ${cx} ${cy})`}
-              strokeLinecap="butt"
-              initial={prefersReducedMotion ? {pathLength: 1, opacity: 1} : {pathLength: 0, opacity: 0}}
-              whileInView={{pathLength: 1, opacity: 1}}
-              viewport={{once: true, amount: 0.65}}
-              transition={revealTransition(prefersReducedMotion, 0.16 + index * 0.08, 0.75)}
-            />
-          )
-        })}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="16" />
+        {segments.map((segment, index) => (
+          <motion.circle
+            key={segment.l}
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke={segment.c}
+            strokeWidth="16"
+            strokeDasharray={`${segment.dash} ${segment.gap}`}
+            strokeDashoffset={segment.offset}
+            transform={`rotate(-90 ${cx} ${cy})`}
+            strokeLinecap="butt"
+            initial={prefersReducedMotion ? {opacity: 1} : {opacity: 0}}
+            whileInView={{opacity: 1}}
+            viewport={{once: true, amount: 0.65}}
+            transition={revealTransition(prefersReducedMotion, 0.16 + index * 0.08, 0.28)}
+          />
+        ))}
         <circle cx={cx} cy={cy} r={r - 8} fill="var(--elevated)" />
         <motion.text x={cx} y={cy - 4} textAnchor="middle" fill="var(--text-1)" fontSize="14" fontWeight="600" initial={prefersReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: 8}} whileInView={{opacity: 1, y: 0}} viewport={{once: true, amount: 0.65}} transition={revealTransition(prefersReducedMotion, 0.42, 0.3)}>100%</motion.text>
         <motion.text x={cx} y={cy + 14} textAnchor="middle" fill="var(--text-4)" fontSize="10" initial={prefersReducedMotion ? {opacity: 1, y: 0} : {opacity: 0, y: 8}} whileInView={{opacity: 1, y: 0}} viewport={{once: true, amount: 0.65}} transition={revealTransition(prefersReducedMotion, 0.48, 0.3)}>Stack</motion.text>
