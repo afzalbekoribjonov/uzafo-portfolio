@@ -122,9 +122,6 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
   const safeActiveIndex = visibleProjects.length > 0 ? wrapIndex(activeIndex, visibleProjects.length) : 0;
   const activeProject = visibleProjects[safeActiveIndex] ?? null;
   const activeLinks = (activeProject?.links ?? []).filter(isUsablePortfolioLink);
-  const projectCountLabel = locale === 'uz'
-    ? `${visibleProjects.length} ta loyiha`
-    : `${visibleProjects.length} projects`;
 
   const goToProject = (nextIndex: number, nextDirection: number) => {
     if (visibleProjects.length <= 1) return;
@@ -151,40 +148,6 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
 
       <section className="py-14 sm:py-18">
         <Container className="space-y-8">
-          <div
-            className="mx-auto max-w-[1080px] overflow-hidden rounded-[30px] border"
-            style={{borderColor: 'var(--border-1)', background: 'var(--surface-1)'}}
-          >
-            <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-              <div className="space-y-2.5">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
-                    {t('carouselBadge')}
-                  </span>
-                  <span
-                    className="rounded-full border px-3 py-1 text-xs"
-                    style={{borderColor: 'var(--border-1)', background: 'var(--elevated)', color: 'var(--text-3)'}}
-                  >
-                    {projectCountLabel}
-                  </span>
-                </div>
-                <p className="max-w-3xl text-sm leading-6" style={{color: 'var(--text-3)'}}>
-                  {t('viewCarouselHint')}
-                </p>
-              </div>
-
-              {isAdmin ? (
-                <button
-                  type="button"
-                  onClick={createProject}
-                  className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300 lg:justify-self-end"
-                >
-                  <Plus className="h-4 w-4" /> Yangi loyiha
-                </button>
-              ) : null}
-            </div>
-          </div>
-
           {visibleProjects.length === 0 ? (
             <div
               className="rounded-[28px] border border-dashed py-16 text-center"
@@ -211,7 +174,16 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {isAdmin ? (
+                    <button
+                      type="button"
+                      onClick={createProject}
+                      className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
+                    >
+                      <Plus className="h-4 w-4" /> Yangi loyiha
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => goToProject(safeActiveIndex - 1, -1)}

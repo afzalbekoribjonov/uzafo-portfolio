@@ -63,12 +63,6 @@ export function SignInClient() {
                 );
               })}
             </div>
-            <div className="mt-6 rounded-[20px] border border-white/10 bg-white/5 p-5">
-              <p className="text-sm font-semibold" style={{color:'var(--text-1)'}}>Live auth</p>
-              <p className="mt-2 text-sm" style={{color:'var(--text-3)'}}>
-                {locale === 'uz' ? 'Admin tugmasi faqat admin hisob bilan tizimga kirilgandan keyin ko\'rinadi.' : 'Admin panel is visible only after signing in with the admin account.'}
-              </p>
-            </div>
           </div>
         </div>
 
