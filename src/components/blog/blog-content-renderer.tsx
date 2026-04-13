@@ -259,7 +259,7 @@ export function BlogContentRenderer({blocks}: BlogContentRendererProps) {
 
         if (block.type === 'image') {
           return (
-            <div key={key} className="space-y-3 min-w-0">
+            <div key={key} className="min-w-0">
               <DynamicMedia
                 src={block.src}
                 alt={resolveText(block.alt, locale)}
@@ -268,14 +268,13 @@ export function BlogContentRenderer({blocks}: BlogContentRendererProps) {
                 placeholderTitle="Image will appear here"
                 placeholderHint="This media slot is currently empty."
               />
-              {resolveText(block.alt, locale) ? <p className="text-center text-sm text-slate-400">{resolveText(block.alt, locale)}</p> : null}
             </div>
           );
         }
 
         if (block.type === 'video') {
           return (
-            <div key={key} className="space-y-3 min-w-0">
+            <div key={key} className="min-w-0">
               <DynamicMedia
                 src={block.src}
                 alt={resolveText(block.caption, locale)}
@@ -284,7 +283,6 @@ export function BlogContentRenderer({blocks}: BlogContentRendererProps) {
                 placeholderTitle="Video will appear here"
                 placeholderHint="This video slot is currently empty."
               />
-              {resolveText(block.caption, locale) ? <p className="text-center text-sm text-slate-400">{resolveText(block.caption, locale)}</p> : null}
             </div>
           );
         }
