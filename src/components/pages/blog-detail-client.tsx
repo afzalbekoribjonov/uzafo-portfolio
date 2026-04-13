@@ -231,6 +231,7 @@ export function BlogDetailClient({initialPosts, slug}: {initialPosts: BlogPost[]
 
                     {editingCover && draft.cover ? (
                       <ImageEditor
+                        key={draft.cover}
                         src={draft.cover}
                         onSave={async (dataUrl) => {
                           const media = await uploadMediaSource(dataUrl, {ownerType: 'post', ownerSlug: slug, role: 'cover'});

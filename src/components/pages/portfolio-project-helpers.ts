@@ -30,6 +30,27 @@ export function isUsablePortfolioLink(link: ProjectLink) {
   return label.length > 0 && href.length > 0 && href !== '#';
 }
 
+export function normalizePortfolioHref(href: string) {
+  const value = href.trim();
+  if (!value || value === '#') return '#';
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(value)) return value;
+  if (/^[a-z][a-z\d+\-.]*:/i.test(value)) return value;
+  if (value.startsWith('//')) return `https:${value}`;
+  return `https://${value.replace(/^\/+/, '')}`;
+}
+
+export function getPortfolioLinkCaption(href: string) {
+  const value = href.trim();
+  if (!value) return '';
+
+  try {
+    const normalized = normalizePortfolioHref(value);
+    return new URL(normalized).hostname.replace(/^www\./i, '');
+  } catch {
+    return value.replace(/^https?:\/\//i, '').replace(/^www\./i, '');
+  }
+}
+
 export function hasStandalonePortfolioContent(project: Project, locale: Locale) {
   const blocks = project.content ?? [];
   if (blocks.length === 0) return false;

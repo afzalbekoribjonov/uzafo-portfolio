@@ -3,7 +3,7 @@
 import {Clapperboard, Image as ImageIcon} from 'lucide-react';
 import {cn} from '@/lib/utils';
 
-function isVideoSource(src: string) {
+export function isVideoSource(src: string) {
   const v = src.trim().toLowerCase();
   return v.startsWith('data:video') || /\.(mp4|webm|ogg|mov)(\?|#|$)/.test(v);
 }

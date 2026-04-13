@@ -1,27 +1,195 @@
 'use client';
 
-import {ArrowRight, ExternalLink, Plus, Trash2} from 'lucide-react';
+import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
+import {ArrowRight, ChevronLeft, ChevronRight, ExternalLink, LayoutPanelTop, PanelsTopLeft, Plus, Trash2} from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import {useMemo, useState} from 'react';
 import {Link, useRouter} from '@/i18n/navigation';
-import {isPublicPortfolioProject} from '@/components/pages/portfolio-project-helpers';
+import {getPortfolioLinkCaption, isPublicPortfolioProject, isUsablePortfolioLink, normalizePortfolioHref} from '@/components/pages/portfolio-project-helpers';
 import {DynamicMedia} from '@/components/ui/dynamic-media';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
 import {useDemoSession} from '@/lib/auth';
 import {createProject as createProjectApi, deleteProject as deleteProjectApi} from '@/lib/api-service';
 import {useManagedProjects} from '@/lib/demo-store';
-import type {Locale, Project} from '@/lib/types';
+import type {Locale, Project, ProjectLink} from '@/lib/types';
 import {makeId, normalizeProject, resolveText} from '@/lib/utils';
+
+type PortfolioViewMode = 'editorial' | 'carousel';
+
+function wrapIndex(index: number, total: number) {
+  if (total === 0) return 0;
+  return (index % total + total) % total;
+}
+
+function ProjectLinks({links, compact = false}: {links: ProjectLink[]; compact?: boolean}) {
+  if (links.length === 0) return null;
+
+  return (
+    <div className={`flex flex-wrap gap-2.5 ${compact ? '' : 'pt-1'}`}>
+      {links.map((link) => (
+        <a
+          key={link.id}
+          href={normalizePortfolioHref(link.href)}
+          target="_blank"
+          rel="noreferrer"
+          className={`group inline-flex min-w-0 items-center gap-3 rounded-[20px] border transition hover:-translate-y-0.5 ${
+            compact
+              ? 'bg-slate-950/55 px-3.5 py-2.5'
+              : 'bg-white/5 px-4 py-3'
+          }`}
+          style={{borderColor: 'var(--border-1)'}}
+        >
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-medium text-white">{link.label}</span>
+            <span className="mt-0.5 block truncate text-xs text-slate-500">{getPortfolioLinkCaption(link.href)}</span>
+          </span>
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-300 transition group-hover:bg-cyan-400/20">
+            <ExternalLink className="h-3.5 w-3.5 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function EditorialProjectCard({
+  project,
+  index,
+  locale,
+  openLabel,
+  onDelete,
+  isAdmin
+}: {
+  project: Project;
+  index: number;
+  locale: Locale;
+  openLabel: string;
+  onDelete: () => void;
+  isAdmin: boolean;
+}) {
+  const visibleLinks = (project.links ?? []).filter(isUsablePortfolioLink);
+  const featuredMetrics = project.metrics.slice(0, 3);
+  const reverse = index % 2 !== 0;
+
+  return (
+    <motion.article
+      layout
+      initial={{opacity: 0, y: 20}}
+      whileInView={{opacity: 1, y: 0}}
+      viewport={{once: true, amount: 0.2}}
+      transition={{duration: 0.45, delay: index * 0.04, ease: [0.22, 1, 0.36, 1]}}
+      className="group relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 shadow-[0_24px_80px_rgba(2,6,23,0.28)]"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.1),transparent_32%)]" />
+      <div className={`relative grid gap-0 ${reverse ? 'lg:grid-cols-[1fr_390px]' : 'lg:grid-cols-[390px_1fr]'}`}>
+        <div className={`relative min-h-[260px] overflow-hidden ${reverse ? 'lg:order-2' : ''}`}>
+          <DynamicMedia
+            src={project.cover}
+            alt={resolveText(project.title, locale)}
+            className="h-full min-h-[260px]"
+            controls={false}
+            mediaClassName="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+            placeholderTitle={resolveText(project.title, locale)}
+            placeholderHint=""
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/15 to-transparent" />
+          <div className="absolute left-5 top-5 flex flex-wrap gap-2">
+            <span className="rounded-full border border-cyan-300/25 bg-slate-950/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-300 backdrop-blur">
+              Case Study {String(index + 1).padStart(2, '0')}
+            </span>
+            <span className="rounded-full border border-white/10 bg-slate-950/75 px-3 py-1 text-[11px] text-slate-300 backdrop-blur">
+              {project.year}
+            </span>
+          </div>
+        </div>
+
+        <div className={`relative flex flex-col justify-between p-6 sm:p-7 lg:p-8 ${reverse ? 'lg:order-1' : ''}`}>
+          <div className="space-y-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1 text-xs text-slate-400">
+                {resolveText(project.status, locale)}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="max-w-3xl text-2xl font-semibold tracking-tight text-white sm:text-[2rem] sm:leading-[1.05]">
+                {resolveText(project.title, locale)}
+              </h2>
+              <p className="max-w-3xl text-sm leading-7 text-slate-300 sm:text-[15px]">
+                {resolveText(project.description, locale)}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <span key={tag} className="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-xs text-slate-300">
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {featuredMetrics.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-3">
+                {featuredMetrics.map((metric, metricIndex) => (
+                  <div key={`${metric.value}-${metricIndex}`} className="rounded-[20px] border border-white/10 bg-slate-950/55 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-slate-500">{resolveText(metric.label, locale)}</p>
+                    <p className="mt-2 text-sm font-semibold text-white">{metric.value}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            <ProjectLinks links={visibleLinks} />
+          </div>
+
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link
+              href={`/portfolio/${project.slug}`}
+              className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
+            >
+              {openLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {isAdmin ? (
+        <div className="absolute right-4 top-4 flex items-center gap-1.5 opacity-100 transition lg:opacity-0 lg:group-hover:opacity-100">
+          <Link
+            href={`/portfolio/${project.slug}?edit=1`}
+            className="rounded-full border border-cyan-300/20 bg-slate-900/90 px-3 py-1.5 text-xs font-medium text-cyan-300 backdrop-blur transition hover:bg-cyan-400/10"
+            onClick={(event) => event.stopPropagation()}
+          >
+            Tahrirlash
+          </Link>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="rounded-full border border-rose-400/20 bg-slate-900/90 p-1.5 text-rose-300 backdrop-blur transition hover:bg-rose-500/10"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ) : null}
+    </motion.article>
+  );
+}
 
 export function PortfolioPageClient({initialProjects}: {initialProjects: Project[]}) {
   const locale = useLocale() as Locale;
   const t = useTranslations('portfolio');
   const common = useTranslations('common');
   const router = useRouter();
+  const prefersReducedMotion = useReducedMotion();
   const {isAdmin} = useDemoSession();
   const [projects, , , replaceProjects] = useManagedProjects(initialProjects);
   const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<PortfolioViewMode>('editorial');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+
   const visibleProjects = useMemo(
     () => isAdmin ? projects : projects.filter(isPublicPortfolioProject),
     [isAdmin, projects]
@@ -62,6 +230,19 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
     setConfirmSlug(null);
   };
 
+  const projectCountLabel = locale === 'uz'
+    ? `${visibleProjects.length} ta loyiha`
+    : `${visibleProjects.length} projects`;
+
+  const safeActiveIndex = visibleProjects.length > 0 ? wrapIndex(activeIndex, visibleProjects.length) : 0;
+  const activeProject = visibleProjects[safeActiveIndex] ?? null;
+
+  const goToProject = (nextIndex: number, nextDirection: number) => {
+    if (visibleProjects.length <= 1) return;
+    setDirection(nextDirection);
+    setActiveIndex(wrapIndex(nextIndex, visibleProjects.length));
+  };
+
   return (
     <>
       {confirmSlug ? (
@@ -81,124 +262,60 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
 
       <section className="py-14 sm:py-18">
         <Container className="space-y-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <span className="rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm text-slate-300">
-              {visibleProjects.length} ta loyiha
-            </span>
-            {isAdmin ? (
-              <button
-                type="button"
-                onClick={createProject}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
-              >
-                <Plus className="h-4 w-4" /> Yangi loyiha
-              </button>
-            ) : null}
-          </div>
-
-          <div className="space-y-6">
-            {visibleProjects.map((project, idx) => (
-              <article
-                key={project.slug}
-                className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 transition hover:border-white/15"
-              >
-                <div className={`grid gap-0 ${idx % 2 === 0 ? 'lg:grid-cols-[380px_1fr]' : 'lg:grid-cols-[1fr_380px]'}`}>
-                  {/* Cover - left on even, right on odd */}
-                  <div className={`relative min-h-[220px] overflow-hidden aspect-[16/10] lg:aspect-auto lg:min-h-0 ${idx % 2 !== 0 ? 'order-2 lg:order-2' : ''}`}>
-                    <DynamicMedia
-                      src={project.cover}
-                      alt={resolveText(project.title, locale)}
-                      className="h-full"
-                      controls={false}
-                      mediaClassName="h-full min-h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                      placeholderTitle={resolveText(project.title, locale)}
-                      placeholderHint=""
-                    />
-                    {/* Year badge overlay */}
-                    <div className="absolute left-4 top-4">
-                      <span className="rounded-full border border-cyan-300/30 bg-slate-900/80 px-3 py-1 text-xs font-semibold text-cyan-300 backdrop-blur">
-                        {project.year}
-                      </span>
-                    </div>
+          <div className="overflow-hidden rounded-[32px] border border-white/10 bg-white/5">
+            <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="space-y-3">
+                <span className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
+                  {t('viewLabel')}
+                </span>
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-[2rem]">
+                      {viewMode === 'editorial' ? t('viewEditorial') : t('viewCarousel')}
+                    </h2>
+                    <span className="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1 text-xs text-slate-300">
+                      {projectCountLabel}
+                    </span>
                   </div>
+                  <p className="max-w-3xl text-sm leading-7 text-slate-300">
+                    {viewMode === 'editorial' ? t('viewEditorialHint') : t('viewCarouselHint')}
+                  </p>
+                </div>
+              </div>
 
-                  {/* Content */}
-                  <div className={`flex flex-col justify-between p-6 lg:p-8 ${idx % 2 !== 0 ? 'order-1 lg:order-1' : ''}`}>
-                    <div className="space-y-4">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-400">
-                          {common('status')}: {resolveText(project.status, locale)}
-                        </span>
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-semibold text-white lg:text-3xl">
-                          {resolveText(project.title, locale)}
-                        </h2>
-                        <p className="mt-3 overflow-hidden text-sm leading-7 text-slate-300 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:5]">
-                          {resolveText(project.description, locale)}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.tags.map(tag => (
-                          <span key={tag} className="rounded-full border border-white/10 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-300">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      {/* Metrics */}
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                        {project.metrics.slice(0,3).map((m, i) => (
-                          <div key={i} className="rounded-[16px] border border-white/8 bg-slate-950/40 p-3">
-                            <p className="text-[10px] uppercase tracking-wide text-slate-500">{resolveText(m.label, locale)}</p>
-                            <p className="mt-1.5 text-sm font-semibold text-white">{m.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-6 flex flex-wrap items-center gap-3">
-                      <Link
-                        href={`/portfolio/${project.slug}`}
-                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
-                      >
-                        {common('openProject')} <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                      {(project.links ?? []).filter(l => l.href !== '#').slice(0,2).map(l => (
-                        <a
-                          key={l.id}
-                          href={l.href}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" /> {l.label}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
+              <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+                <div className="inline-flex rounded-[20px] border border-white/10 bg-slate-950/55 p-1.5">
+                  {([
+                    {id: 'editorial', label: t('viewEditorial'), icon: LayoutPanelTop},
+                    {id: 'carousel', label: t('viewCarousel'), icon: PanelsTopLeft}
+                  ] as const).map(({id, label, icon: Icon}) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setViewMode(id)}
+                      className={`inline-flex items-center gap-2 rounded-[16px] px-4 py-2.5 text-sm font-medium transition ${
+                        viewMode === id
+                          ? 'bg-cyan-400 text-slate-950'
+                          : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {label}
+                    </button>
+                  ))}
                 </div>
 
-                {/* Admin quick-actions */}
                 {isAdmin ? (
-                  <div className="absolute right-4 top-4 flex items-center gap-1.5 opacity-100 transition lg:opacity-0 lg:group-hover:opacity-100">
-                    <Link
-                      href={`/portfolio/${project.slug}?edit=1`}
-                      className="rounded-full border border-cyan-300/20 bg-slate-900/90 px-3 py-1.5 text-xs font-medium text-cyan-300 backdrop-blur transition hover:bg-cyan-400/10"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      Tahrirlash
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmSlug(project.slug)}
-                      className="rounded-full border border-rose-400/20 bg-slate-900/90 p-1.5 text-rose-300 backdrop-blur transition hover:bg-rose-500/10"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={createProject}
+                    className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
+                  >
+                    <Plus className="h-4 w-4" /> Yangi loyiha
+                  </button>
                 ) : null}
-              </article>
-            ))}
+              </div>
+            </div>
           </div>
 
           {visibleProjects.length === 0 ? (
@@ -209,6 +326,200 @@ export function PortfolioPageClient({initialProjects}: {initialProjects: Project
                   <Plus className="h-4 w-4" /> Birinchi loyihani qo&apos;shing
                 </button>
               ) : null}
+            </div>
+          ) : null}
+
+          {visibleProjects.length > 0 && viewMode === 'editorial' ? (
+            <div className="space-y-6">
+              {visibleProjects.map((project, index) => (
+                <EditorialProjectCard
+                  key={project.slug}
+                  project={project}
+                  index={index}
+                  locale={locale}
+                  openLabel={common('openProject')}
+                  onDelete={() => setConfirmSlug(project.slug)}
+                  isAdmin={isAdmin}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {visibleProjects.length > 0 && viewMode === 'carousel' && activeProject ? (
+            <div className="space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-400">
+                    {String(safeActiveIndex + 1).padStart(2, '0')} / {String(visibleProjects.length).padStart(2, '0')}
+                  </span>
+                  <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                    {t('carouselBadge')}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => goToProject(safeActiveIndex - 1, -1)}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
+                    aria-label={t('prevProject')}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goToProject(safeActiveIndex + 1, 1)}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-cyan-400 text-slate-950 transition hover:bg-cyan-300"
+                    aria-label={t('nextProject')}
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-white/5 shadow-[0_30px_110px_rgba(2,6,23,0.32)]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.14),transparent_28%),linear-gradient(135deg,rgba(15,23,42,0.6),rgba(15,23,42,0.18))]" />
+
+                <AnimatePresence initial={false} mode="wait" custom={direction}>
+                  <motion.article
+                    key={activeProject.slug}
+                    custom={direction}
+                    initial={prefersReducedMotion ? {opacity: 1} : {opacity: 0, x: direction > 0 ? 56 : -56, scale: 0.98}}
+                    animate={prefersReducedMotion ? {opacity: 1} : {opacity: 1, x: 0, scale: 1}}
+                    exit={prefersReducedMotion ? {opacity: 0} : {opacity: 0, x: direction > 0 ? -56 : 56, scale: 0.985}}
+                    transition={{duration: prefersReducedMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1]}}
+                    className="relative grid gap-0 lg:grid-cols-[minmax(0,1.02fr)_minmax(360px,0.98fr)]"
+                  >
+                    <div className="flex min-w-0 flex-col justify-between p-6 sm:p-7 lg:p-8 xl:p-10">
+                      <div className="space-y-6">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="rounded-full border border-cyan-300/25 bg-slate-950/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">
+                            Spotlight
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1 text-xs text-slate-300">
+                            {activeProject.year}
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1 text-xs text-slate-300">
+                            {resolveText(activeProject.status, locale)}
+                          </span>
+                        </div>
+
+                        <div className="space-y-4">
+                          <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-[2.6rem] sm:leading-[1.02]">
+                            {resolveText(activeProject.title, locale)}
+                          </h2>
+                          <p className="max-w-2xl text-sm leading-8 text-slate-300 sm:text-base">
+                            {resolveText(activeProject.description, locale)}
+                          </p>
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-2">
+                          {activeProject.metrics.slice(0, 4).map((metric, index) => (
+                            <div key={`${metric.value}-${index}`} className="rounded-[24px] border border-white/10 bg-slate-950/55 p-4">
+                              <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{resolveText(metric.label, locale)}</p>
+                              <p className="mt-2 text-base font-semibold text-white">{metric.value}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {activeProject.tags.map((tag) => (
+                            <span key={tag} className="rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-xs text-slate-300">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        <ProjectLinks links={(activeProject.links ?? []).filter(isUsablePortfolioLink)} compact />
+                      </div>
+
+                      <div className="mt-7 flex flex-wrap items-center gap-3">
+                        <Link
+                          href={`/portfolio/${activeProject.slug}`}
+                          className="inline-flex items-center gap-2 rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-300"
+                        >
+                          {common('openProject')}
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+
+                        {isAdmin ? (
+                          <>
+                            <Link
+                              href={`/portfolio/${activeProject.slug}?edit=1`}
+                              className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400/20"
+                            >
+                              Tahrirlash
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => setConfirmSlug(activeProject.slug)}
+                              className="inline-flex items-center gap-2 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-2.5 text-sm font-medium text-rose-300 transition hover:bg-rose-500/20"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              O&apos;chirish
+                            </button>
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="relative min-h-[320px] p-4 sm:p-5 lg:p-6">
+                      <div className="absolute left-8 top-8 hidden h-24 w-24 rounded-full bg-cyan-400/10 blur-3xl lg:block" />
+                      <div className="absolute bottom-10 right-12 hidden h-28 w-28 rounded-full bg-sky-400/10 blur-3xl lg:block" />
+                      <div className="relative h-full overflow-hidden rounded-[30px] border border-white/10 bg-slate-950/70">
+                        <DynamicMedia
+                          src={activeProject.cover}
+                          alt={resolveText(activeProject.title, locale)}
+                          className="h-full min-h-[320px]"
+                          controls={false}
+                          mediaClassName="h-full w-full object-cover"
+                          placeholderTitle={resolveText(activeProject.title, locale)}
+                          placeholderHint=""
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                          <div className="rounded-[24px] border border-white/10 bg-slate-950/70 p-4 backdrop-blur">
+                            <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-300">{t('carouselPreview')}</p>
+                            <p className="mt-2 text-lg font-semibold text-white">{resolveText(activeProject.title, locale)}</p>
+                            <p className="mt-2 text-sm leading-6 text-slate-300">
+                              {resolveText(activeProject.excerpt, locale) || resolveText(activeProject.description, locale)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.article>
+                </AnimatePresence>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {visibleProjects.map((project, index) => {
+                  const isActive = index === safeActiveIndex;
+                  return (
+                    <button
+                      key={project.slug}
+                      type="button"
+                      onClick={() => goToProject(index, index >= safeActiveIndex ? 1 : -1)}
+                      className={`text-left rounded-[24px] border px-4 py-4 transition ${
+                        isActive
+                          ? 'border-cyan-300/30 bg-cyan-400/10'
+                          : 'border-white/10 bg-white/5 hover:-translate-y-0.5 hover:border-white/15 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className={`h-2.5 w-2.5 rounded-full ${isActive ? 'bg-cyan-300' : 'bg-white/10'}`} />
+                      </div>
+                      <p className="mt-3 line-clamp-2 text-base font-semibold text-white">{resolveText(project.title, locale)}</p>
+                      <p className="mt-2 line-clamp-2 text-sm text-slate-400">
+                        {resolveText(project.excerpt, locale) || resolveText(project.description, locale)}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
         </Container>

@@ -148,6 +148,7 @@ export function ContentBlockEditor({blocks, onChange, locale, allowAdd = true, u
                 <div className="space-y-3">
                   {editingThisImage && block.src ? (
                     <ImageEditor
+                      key={block.src}
                       src={block.src}
                       onSave={async (dataUrl) => {
                         try {

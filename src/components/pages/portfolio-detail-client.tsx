@@ -7,8 +7,9 @@ import {Link, useRouter} from '@/i18n/navigation';
 import {useSearchParams} from 'next/navigation';
 import {BlogContentRenderer} from '@/components/blog/blog-content-renderer';
 import {ContentBlockEditor} from '@/components/editor/content-block-editor';
-import {hasStandalonePortfolioContent, isPublicPortfolioProject, isUsablePortfolioLink, isUsablePortfolioMetric, isUsablePortfolioTag} from '@/components/pages/portfolio-project-helpers';
-import {DynamicMedia} from '@/components/ui/dynamic-media';
+import {getPortfolioLinkCaption, hasStandalonePortfolioContent, isPublicPortfolioProject, isUsablePortfolioLink, isUsablePortfolioMetric, isUsablePortfolioTag, normalizePortfolioHref} from '@/components/pages/portfolio-project-helpers';
+import {DynamicMedia, MediaTypeBadge, isVideoSource} from '@/components/ui/dynamic-media';
+import {ImageEditor} from '@/components/ui/image-editor';
 import {AdminInlineBar} from '@/components/ui/admin-inline-bar';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
@@ -49,17 +50,6 @@ function isRoleMetric(metric: ProjectMetric, locale: Locale) {
   return label === 'role' || label === 'rol' || label.includes('role') || label.includes('rol');
 }
 
-function getPortfolioLinkCaption(href: string) {
-  const value = href.trim();
-  if (!value) return '';
-  try {
-    const normalized = /^https?:\/\//i.test(value) ? value : `https://${value.replace(/^\/+/, '')}`;
-    return new URL(normalized).hostname.replace(/^www\./i, '');
-  } catch {
-    return value.replace(/^https?:\/\//i, '').replace(/^www\./i, '');
-  }
-}
-
 export function PortfolioDetailClient({initialProjects, slug}: {initialProjects: Project[]; slug: string}) {
   const locale = useLocale() as Locale;
   const t = useTranslations('portfolio');
@@ -78,8 +68,12 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
   const [draft, setDraft] = useState<Project | null>(project);
   const [editing, setEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [editingCover, setEditingCover] = useState(false);
 
-  useEffect(() => setDraft(project), [project]);
+  useEffect(() => {
+    setDraft(project);
+    setEditingCover(false);
+  }, [project]);
   useEffect(() => { if (isAdmin && searchParams.get('edit') === '1') setEditing(true); }, [isAdmin, searchParams]);
 
   if (!project || !draft) {
@@ -101,7 +95,11 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
     setEditing(false);
   };
 
-  const cancelDraft = () => { setDraft(project); setEditing(false); };
+  const cancelDraft = () => {
+    setDraft(project);
+    setEditing(false);
+    setEditingCover(false);
+  };
   const deleteProject = async () => {
     try {
       await deleteProjectApi(slug);
@@ -150,7 +148,12 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
                       <p className="text-xs text-slate-400">Use an image or video, or leave the project without cover media.</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <button type="button" onClick={() => setDraft({...draft, cover: ''})} className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-200 transition hover:bg-rose-500/20"><Trash2 className="h-3.5 w-3.5" /> Remove</button>
+                      {draft.cover && !isVideoSource(draft.cover) && !editingCover ? (
+                        <button type="button" onClick={() => setEditingCover(true)} className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-2 text-xs text-cyan-300 transition hover:bg-cyan-400/20">
+                          Tahrirlash
+                        </button>
+                      ) : null}
+                      <button type="button" onClick={() => { setDraft({...draft, cover: ''}); setEditingCover(false); }} className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-200 transition hover:bg-rose-500/20"><Trash2 className="h-3.5 w-3.5" /> Remove</button>
                       <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 transition hover:bg-white/10">
                         <Upload className="h-4 w-4" /> Upload
                         <input type="file" accept="image/*,video/*" className="hidden" onChange={async (e) => {
@@ -160,6 +163,7 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
                           try {
                             const media = await uploadMediaSource(file, {ownerType: 'project', ownerSlug: slug, role: 'cover'});
                             setDraft({...draft, cover: media.url});
+                            setEditingCover(false);
                           } finally {
                             input.value = '';
                           }
@@ -167,15 +171,31 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
                       </label>
                     </div>
                   </div>
-                  <DynamicMedia
-                    src={displayed.cover}
-                    alt={titleText}
-                    className="aspect-[16/10] rounded-[32px] border border-white/10 bg-slate-950/70"
-                    mediaClassName="h-full w-full object-cover"
-                    placeholderTitle="No project cover yet"
-                    placeholderHint="This project can stay media-free until you add an image or video."
-                  />
-                  <input value={draft.cover} onChange={(e) => setDraft({...draft, cover: e.target.value})} className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none" placeholder="Cover URL" />
+                  {editingCover && draft.cover && !isVideoSource(draft.cover) ? (
+                    <ImageEditor
+                      key={draft.cover}
+                      src={draft.cover}
+                      onSave={async (dataUrl) => {
+                        const media = await uploadMediaSource(dataUrl, {ownerType: 'project', ownerSlug: slug, role: 'cover'});
+                        setDraft({...draft, cover: media.url});
+                        setEditingCover(false);
+                      }}
+                      onCancel={() => setEditingCover(false)}
+                    />
+                  ) : (
+                    <>
+                      <MediaTypeBadge src={draft.cover} />
+                      <DynamicMedia
+                        src={displayed.cover}
+                        alt={titleText}
+                        className="aspect-[16/10] rounded-[32px] border border-white/10 bg-slate-950/70"
+                        mediaClassName="h-full w-full object-cover"
+                        placeholderTitle="No project cover yet"
+                        placeholderHint="This project can stay media-free until you add an image or video."
+                      />
+                      <input value={draft.cover} onChange={(e) => { setDraft({...draft, cover: e.target.value}); setEditingCover(false); }} className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none" placeholder="Cover URL" />
+                    </>
+                  )}
                 </div>
 
                 <div className="min-w-0 space-y-6 rounded-[32px] border border-white/10 bg-white/5 p-5 sm:p-6">
@@ -322,7 +342,7 @@ export function PortfolioDetailClient({initialProjects, slug}: {initialProjects:
                           {visibleLinks.map((linkItem) => (
                             <a
                               key={linkItem.id}
-                              href={linkItem.href}
+                              href={normalizePortfolioHref(linkItem.href)}
                               target="_blank"
                               rel="noreferrer"
                               className="group inline-flex min-w-0 items-center justify-between gap-3 rounded-[22px] border px-4 py-3.5 text-sm transition hover:-translate-y-0.5"
