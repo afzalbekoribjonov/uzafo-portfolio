@@ -72,7 +72,17 @@ type BuildMetadataOptions = {
   title?: string;
   description?: string;
   type?: 'website' | 'article';
+  robots?: Metadata['robots'];
 };
+
+export const NON_INDEXABLE_ROBOTS = {
+  index: false,
+  follow: false,
+  googleBot: {
+    index: false,
+    follow: false
+  }
+} satisfies NonNullable<Metadata['robots']>;
 
 function buildTitle(page: MetadataPage, locale: Locale, override?: string) {
   if (override) return `${override} | ${SITE_NAME}`;
@@ -89,6 +99,7 @@ export function buildPageMetadata(page: MetadataPage, locale: Locale, options: B
   return {
     title,
     description,
+    robots: options.robots,
     alternates: {
       canonical,
       languages: {

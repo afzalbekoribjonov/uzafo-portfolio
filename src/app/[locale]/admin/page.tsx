@@ -3,12 +3,12 @@ import {AdminHomeClient} from '@/components/admin/admin-home-client';
 import {Container} from '@/components/ui/container';
 import {PageHero} from '@/components/ui/page-hero';
 import {getBlogPosts, getDiscussions, getProfile, getProjects, getResume, getUsers} from '@/lib/data';
-import {buildPageMetadata} from '@/lib/metadata';
+import {buildPageMetadata, NON_INDEXABLE_ROBOTS} from '@/lib/metadata';
 import type {Locale} from '@/lib/types';
 
 export async function generateMetadata({params}: {params: Promise<{locale: Locale}>}) {
   const {locale} = await params;
-  return buildPageMetadata('admin', locale);
+  return buildPageMetadata('admin', locale, {robots: NON_INDEXABLE_ROBOTS});
 }
 
 export default async function AdminPage({params}: {params: Promise<{locale: Locale}>}) {
