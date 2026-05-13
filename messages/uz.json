@@ -166,6 +166,8 @@
     "replyTitle": "Javob yozing",
     "replyPlaceholder": "Aniq va foydali javob yozing...",
     "replyIdentity": "{name} sifatida javob qoldirasiz",
+    "replyNameLabel": "Ismingiz",
+    "replyNamePlaceholder": "Ismingizni yozing...",
     "replySubmit": "Javob yuborish",
     "replyEmpty": "Hali javob yo‘q. Birinchi foydali javobni qoldiring.",
     "signInToReply": "Javob qoldirish uchun tizimga kiring"

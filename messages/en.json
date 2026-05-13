@@ -166,6 +166,8 @@
     "replyTitle": "Write a reply",
     "replyPlaceholder": "Write a clear and useful reply...",
     "replyIdentity": "You are replying as {name}",
+    "replyNameLabel": "Your Name",
+    "replyNamePlaceholder": "Enter your name...",
     "replySubmit": "Send reply",
     "replyEmpty": "No replies yet. Be the first to leave a useful answer.",
     "signInToReply": "Sign in to leave a reply"

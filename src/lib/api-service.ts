@@ -108,7 +108,7 @@ export async function deleteDiscussion(slug: string): Promise<void> {
 
 export async function addReply(
   slug: string,
-  reply: {text: string}
+  reply: {text: string; authorName?: string}
 ): Promise<Discussion> {
   return apiFetch<Discussion>(`/api/discussions/${slug}/replies`, {
     method: 'POST',

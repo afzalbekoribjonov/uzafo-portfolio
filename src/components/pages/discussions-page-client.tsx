@@ -382,67 +382,73 @@ export function DiscussionsPageClient({initialDiscussions}: {initialDiscussions:
               ) : null}
             </motion.div>
           ) : (
-            <div className="grid gap-4 xl:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {filtered.map((discussion, index) => (
                 <motion.div
                   key={discussion.slug}
                   {...getRevealProps(prefersReducedMotion, 0.05 + index * 0.04)}
-                  whileHover={prefersReducedMotion ? undefined : {y: -4}}
-                  transition={prefersReducedMotion ? undefined : {duration: 0.22, ease: 'easeOut'}}
+                  whileHover={prefersReducedMotion ? undefined : {y: -4, scale: 1.01}}
+                  transition={prefersReducedMotion ? undefined : {duration: 0.3, ease: [0.22, 1, 0.36, 1]}}
                 >
                   <Link
                     href={`/discussions/${discussion.slug}`}
-                    className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[28px] border p-5 sm:p-6"
-                    style={{borderColor: 'var(--border-1)', background: 'linear-gradient(180deg, var(--surface-1), var(--elevated))'}}
+                    className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[32px] p-6 sm:p-7"
+                    style={{
+                      background: 'var(--surface-1)',
+                      boxShadow: '0 4px 24px -1px rgba(0, 0, 0, 0.1), 0 2px 8px -1px rgba(0, 0, 0, 0.06)',
+                    }}
                   >
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_34%)] opacity-80 transition duration-300 group-hover:opacity-100" />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                     <div className="relative flex h-full flex-col">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
                           <span
-                            className="rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]"
-                            style={{borderColor: 'rgba(8,145,178,0.22)', background: 'var(--accent-m)', color: 'var(--accent)'}}
+                            className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
+                            style={{background: 'var(--accent-m)', color: 'var(--accent)'}}
                           >
                             {resolveText(discussion.category, locale)}
                           </span>
                           <span
-                            className="rounded-full border px-3 py-1 text-[11px]"
-                            style={{borderColor: 'var(--border-1)', background: 'var(--surface-1)', color: 'var(--text-3)'}}
+                            className="text-[10px] font-medium uppercase tracking-wider"
+                            style={{color: 'var(--text-4)'}}
                           >
-                            {t('repliesCount', {count: discussion.messages.length})}
+                            • {formatDateTime(discussion.createdAt, locale)}
                           </span>
                         </div>
-                        <span className="shrink-0 text-xs" style={{color: 'var(--text-4)'}}>
-                          {formatDateTime(discussion.createdAt, locale)}
-                        </span>
+                        <div
+                          className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium"
+                          style={{borderColor: 'var(--border-1)', color: 'var(--text-3)'}}
+                        >
+                          <MessageSquareMore className="h-3 w-3" />
+                          {discussion.messages.length}
+                        </div>
                       </div>
 
-                      <h3 className="mt-5 line-clamp-2 text-xl font-semibold tracking-tight transition group-hover:text-cyan-200" style={{color: 'var(--text-1)'}}>
+                      <h3 className="mt-5 text-xl font-bold leading-tight tracking-tight transition-colors group-hover:text-cyan-400" style={{color: 'var(--text-1)'}}>
                         {resolveText(discussion.title, locale)}
                       </h3>
-                      <p className="mt-3 flex-1 line-clamp-3 text-sm leading-7" style={{color: 'var(--text-3)'}}>
+                      <p className="mt-3 flex-1 line-clamp-2 text-sm leading-relaxed" style={{color: 'var(--text-3)'}}>
                         {resolveText(discussion.summary, locale)}
                       </p>
 
-                      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4" style={{borderColor: 'var(--border-faint)'}}>
+                      <div className="mt-8 flex items-center justify-between gap-4 border-t pt-5" style={{borderColor: 'var(--border-faint)'}}>
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-400/10 text-sm font-bold text-cyan-300">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-sm font-bold text-cyan-400">
                             {discussion.author.name.charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium" style={{color: 'var(--text-1)'}}>
+                            <p className="truncate text-sm font-semibold" style={{color: 'var(--text-1)'}}>
                               {discussion.author.name}
                             </p>
-                            <p className="truncate text-xs" style={{color: 'var(--text-4)'}}>
+                            <p className="truncate text-[11px] font-medium" style={{color: 'var(--text-4)'}}>
                               {resolveText(discussion.author.title, locale)}
                             </p>
                           </div>
                         </div>
 
-                        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-cyan-300">
-                          {t('openDiscussion')}
-                          <ArrowRight className="h-4 w-4 transition duration-200 group-hover:translate-x-1" />
-                        </span>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 transition-colors group-hover:bg-cyan-500 group-hover:text-slate-950">
+                          <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+                        </div>
                       </div>
                     </div>
                   </Link>
