@@ -115,7 +115,7 @@
   },
   "about": {
     "title": "About the Developer",
-    "subtitle": "My technologies, experience, and learning direction in one place.",
+    "subtitle": "My technologies, experience, and learning direction.",
     "knowledgeMap": "Knowledge map",
     "timeline": "Journey timeline",
     "technologyTable": "Technology table"
@@ -264,5 +264,8 @@
     "openAssistant": "Open AI assistant",
     "closeAssistant": "Close AI assistant",
     "copied": "Copied to clipboard."
+  }
+}
+board."
   }
 }
